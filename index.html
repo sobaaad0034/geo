@@ -1,0 +1,2439 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ГЕО">
+<meta name="theme-color" content="#1b5e20">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<title>ГЕО</title>
+<style>
+:root{--bg:#0f1a12;--card:#16241a;--line:#25392b;--ink:#eaf2ec;--muted:#8ba894;
+  --acc:#2E7D32;--acc-d:#1b5e20;--green:#4a8c5f;--amber:#B5852A;--red:#b3261e;--vio:#d9c9ff;--blue:#8fc9e8;}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;font-size:16px;line-height:1.4;padding-bottom:90px}
+.wrap{max-width:600px;margin:0 auto;padding:0 14px}
+header{background:linear-gradient(135deg,#1b5e20,#2f6b3d);padding:12px 16px 0;position:sticky;top:0;z-index:5;border-bottom:1px solid var(--line)}
+header h1{margin:0;font-size:19px;font-weight:700;display:flex;justify-content:space-between;align-items:center}
+header h1 small{font-size:11px;font-weight:500;color:#9fd3ab}
+.me{font-size:12px;color:#bfe0c8;margin-top:2px;padding-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:8px}
+.me button{background:transparent;border:1px solid rgba(255,255,255,.25);color:#bfe0c8;border-radius:8px;font-size:12px;padding:3px 9px;min-height:26px}
+.tabs{display:flex;gap:2px;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:0 0 auto;min-height:44px;border:none;background:transparent;color:#bfe0c8;font-size:13px;font-weight:600;border-bottom:3px solid transparent;padding:0 12px;white-space:nowrap}
+.tab.on{color:#fff;border-bottom-color:#78c842}
+.tab .b{display:none;background:#e05252;color:#fff;border-radius:11px;font-size:11px;font-weight:700;padding:1px 6px;margin-left:3px;vertical-align:1px}
+.tab .b.on{display:inline-block}
+.tab .b.am{background:#e0a52a;color:#123}
+.view{display:none}.view.on{display:block}
+.field{margin-top:14px}
+label{display:block;font-size:12px;color:var(--muted);margin-bottom:5px;font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+label .tag{display:inline-block;font-size:9.5px;font-weight:800;padding:2px 6px;border-radius:8px;margin-left:6px;vertical-align:1px;letter-spacing:0;text-transform:none}
+.t-auto{background:#12333a;color:#7fd4e0}.t-opt{background:#3a3320;color:#e5c77a}
+input,select,textarea{width:100%;min-height:48px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:16px;padding:0 13px;outline:none;font-family:inherit}
+textarea{min-height:66px;padding:10px 13px;resize:none}
+input:focus,select:focus,textarea:focus{border-color:var(--green)}
+input.auto{background:#101f16;border-style:dashed;color:#9be3ac}
+input[readonly]{color:var(--amber)}
+select{appearance:none;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 16 16' fill='none' stroke='%238ba894' stroke-width='2'><path d='M4 6l4 4 4-4'/></svg>");background-repeat:no-repeat;background-position:right 12px center;padding-right:36px}
+.rowf{display:flex;gap:10px}.rowf>.field{flex:1;margin-top:14px}
+.eq{align-self:flex-end;padding-bottom:14px;color:var(--muted);font-size:20px;font-weight:700}
+.sec{margin-top:16px;padding:7px 11px;background:#12270d;border-left:3px solid var(--green);border-radius:0 8px 8px 0;font-size:13px;font-weight:700;color:#9be3ac;text-transform:uppercase;letter-spacing:.04em}
+.calc{font-size:12.5px;color:var(--amber);margin-top:5px;font-weight:600;min-height:17px}
+.hint{font-size:12.5px;color:var(--muted);margin-top:6px}
+.photo-btn{margin-top:12px;width:100%;min-height:48px;background:var(--card);border:1px dashed var(--green);border-radius:10px;color:var(--ink);font-size:15px;font-weight:600}
+.photo-btn.done{border-style:solid;border-color:#5fd08a;color:#9be3ac}
+.prev{margin-top:8px;max-width:140px;max-height:140px;border-radius:8px;border:1px solid var(--line);display:none}
+.bar{position:fixed;left:0;right:0;bottom:0;background:rgba(15,26,18,.97);border-top:1px solid var(--line);padding:12px 14px;backdrop-filter:blur(8px);display:none}
+.bar.on{display:block}
+.save{width:100%;min-height:54px;border:none;border-radius:12px;background:var(--acc);color:#fff;font-size:18px;font-weight:700}
+.save:active{background:var(--acc-d)}.save:disabled{opacity:.55}
+.toast{position:fixed;left:50%;bottom:86px;transform:translateX(-50%) translateY(16px);background:#1b5e20;color:#fff;padding:10px 18px;border-radius:10px;font-weight:600;opacity:0;transition:.22s;z-index:60;max-width:92%}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}.toast.err{background:var(--red)}
+.back{background:transparent;border:none;color:#9be3ac;font-size:15px;font-weight:600;padding:0;min-height:44px}
+.ghost{width:100%;min-height:46px;margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:10px;color:var(--ink);font-size:15px;font-weight:600}
+.refresh{background:var(--card);border:1px solid var(--line);color:var(--ink);min-height:38px;border-radius:10px;padding:0 14px;font-size:14px;font-weight:600}
+.ord-head{margin-top:12px;font-size:13px;color:var(--muted);display:flex;justify-content:space-between;align-items:center}
+.empty{margin-top:34px;text-align:center;color:var(--muted);font-size:15px;line-height:1.7}
+/* под-вкладки */
+.szt{display:flex;gap:6px;margin-top:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.szt::-webkit-scrollbar{display:none}
+.szt button{flex:0 0 auto;min-height:40px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);font-size:13.5px;font-weight:700;padding:0 12px;white-space:nowrap}
+.szt button.on{border-color:#5fd08a;background:#12330f;color:#9be3ac}
+.szt button .b{display:none;background:#e05252;color:#fff;border-radius:9px;font-size:10.5px;padding:0 5px;margin-left:4px}
+.szt button .b.on{display:inline-block}
+/* Зарядка таблица */
+.z-table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px}
+.z-table th{background:#12270d;color:#9be3ac;padding:7px 6px;text-align:center;border:1px solid var(--line);font-weight:600}
+.z-table td{padding:4px;border:1px solid var(--line)}
+.z-table td input{min-height:36px;border-radius:6px;font-size:14px;padding:0 8px}
+.ztog{display:flex;gap:6px;margin-top:10px}
+.ztog button{flex:1;min-height:42px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);font-size:14px;font-weight:700}
+.ztog button.on{border-color:#5fd08a;background:#12330f;color:#9be3ac}
+.ztog button small{display:block;font-size:10px;font-weight:600;color:var(--muted)}
+/* поиск в каталоге */
+.dd{position:absolute;left:0;right:0;background:#172a1d;border:1px solid var(--green);border-top:none;border-radius:0 0 10px 10px;z-index:10;max-height:220px;overflow-y:auto}
+.dd-row{padding:9px 12px;cursor:pointer;font-size:14px;border-top:1px solid var(--line)}
+.dd-row:hover{background:var(--card)}
+.srch{position:relative}
+details summary{color:var(--muted);font-size:12px;cursor:pointer;margin-top:14px}
+.setup{margin-top:8px;padding:12px;border:1px dashed var(--amber);border-radius:10px;background:#1c1710}
+.setup label{color:var(--amber)}
+/* вход */
+.login{position:fixed;inset:0;background:var(--bg);z-index:50;display:none;overflow:auto}
+.login.on{display:block}
+.login .box{max-width:420px;margin:0 auto;padding:40px 22px}
+.login h2{margin:0;font-size:22px}
+.login .h{color:var(--muted);font-size:14px;margin:6px 0 18px}
+.pinrow{display:flex;gap:10px}
+.pinrow input{flex:1;text-align:center;font-size:26px;letter-spacing:10px;font-weight:700}
+.login .save{margin-top:16px}
+.login .err{color:#ff9b9b;font-size:14px;margin-top:10px;min-height:20px;font-weight:600}
+/* карточки участков / главной / техники */
+.ucs{margin-top:8px}
+.uc{display:flex;gap:11px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 11px;margin-top:7px;cursor:pointer}
+.uc.on{border-color:#5fd08a;background:#12330f}
+.uc.act{border-color:#5a4a8a}.uc.warn{border-color:#7a3535}.uc.am{border-color:#5c4a1e}
+.uc img{width:52px;height:52px;flex:0 0 52px;border-radius:8px;object-fit:contain;background:#0b1a0e;border:1px solid var(--line)}
+.uc .noimg,.uc .th{width:52px;height:52px;flex:0 0 52px;border-radius:8px;background:#0b1a0e;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:22px;color:#3d5b3f}
+.uc .th{font-size:24px;color:inherit;width:44px;height:44px;flex-basis:44px}
+.uc .t{flex:1;min-width:0}
+.uc .t b{font-size:14px;font-weight:600;display:block;line-height:1.3}
+.uc .t span{font-size:11.5px;color:var(--muted);display:block}
+.uc .r{font-size:12.5px;font-weight:700;color:#e0a52a;white-space:nowrap}
+.uc .r.done,.uc .r.ok{color:#9be3ac}.uc .r.bad{color:#ff9b9b}
+.pr{height:5px;background:#0b1a0e;border-radius:3px;margin-top:5px;overflow:hidden}
+.pr i{display:block;height:100%;background:#5fd08a}.pr i.w{background:#e0a52a}.pr i.b{background:#ff6b6b}
+/* заявки на саженцы / топливо */
+.zk{margin-top:10px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.zk.open{border-color:#5a4a8a;background:#17203a}
+.zk .r1{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.zk .nm{font-weight:700;font-size:15px}
+.zk .mt{font-size:12px;color:var(--muted);margin-top:3px}
+.zk .who{font-size:17px;font-weight:700}
+.zk .need{font-size:28px;font-weight:800;color:#e5c77a;margin-top:2px;line-height:1.1}
+.zk .need small{font-size:13px;font-weight:600;color:var(--muted);margin-left:6px}
+.zk .note{margin-top:8px;font-size:14px;color:var(--vio);background:#1e1a35;border-radius:8px;padding:8px 10px}
+.zk .go{margin-top:12px;width:100%;min-height:48px;border:none;border-radius:11px;background:var(--acc);color:#fff;font-size:16px;font-weight:700}
+.pill{font-size:10.5px;font-weight:800;padding:4px 9px;border-radius:12px;white-space:nowrap}
+.pill.vi{background:#2a2145;color:var(--vio)}.pill.go{background:#123a36;color:#7fe3d6}.pill.ok{background:#1c3a2a;color:#9be3ac}
+.pill.no{background:#3d2a12;color:#e5c77a}.pill.gr{background:#20323b;color:var(--muted)}
+.zk .got{margin-top:10px;width:100%;min-height:48px;border:none;border-radius:10px;background:var(--acc);color:#fff;font-size:16px;font-weight:700}
+.zk .pb{margin-top:8px;width:100%;min-height:42px;background:transparent;border:1px dashed var(--green);border-radius:10px;color:#9be3ac;font-size:14px;font-weight:600}
+.zk .pb.done{border-style:solid}
+.hand{margin-top:12px;background:#12270d;border:1px solid #23502f;border-radius:12px;padding:12px 14px;font-size:15px;color:#bfe6c9}
+.hand b{color:#fff}
+.hand.am{border-color:#5c4a1e;background:#2b2416;color:#e8d9ae}
+/* партии (все) */
+.p{margin-top:12px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.p.nodoc{border-color:#5c4a1e}
+.p .r1{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}
+.p .nm{font-weight:700;font-size:15.5px}
+.p .uc2{font-size:12.5px;color:var(--muted);margin-top:2px}
+.nums{display:flex;gap:16px;margin-top:9px;font-size:12px;flex-wrap:wrap}
+.nums span{color:var(--muted);display:block;font-size:9.5px;text-transform:uppercase;letter-spacing:.03em;font-weight:800}
+.nums b{font-size:14.5px}
+.thumbs{display:flex;gap:6px;margin-top:9px;align-items:center;font-size:11.5px;color:var(--muted)}
+.thumbs img{width:34px;height:34px;border-radius:6px;object-fit:cover;border:1px solid var(--line)}
+.act{display:flex;gap:8px;margin-top:11px}
+.act button{flex:1;min-height:42px;border:1px solid var(--line);background:transparent;border-radius:9px;font-size:13.5px;font-weight:700;color:#9be3ac}
+a.lnk{color:#9be3ac;font-weight:600;text-decoration:none}
+/* закупки — карточки закупщика */
+.chips{display:flex;gap:6px;overflow-x:auto;margin-top:9px;padding-bottom:4px;scrollbar-width:none}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex:0 0 auto;padding:7px 13px;border:1px solid var(--line);border-radius:20px;background:var(--card);color:var(--muted);font-size:13px;font-weight:600;white-space:nowrap}
+.chip.on{background:#12330f;border-color:#5fd08a;color:#9be3ac}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:11px 13px;margin-top:10px}
+.card .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.card .nm{font-weight:700;font-size:15px}
+.meta{font-size:13px;color:var(--muted);margin-top:3px}
+.meta b{color:var(--ink)}
+.price{font-size:14px;font-weight:700;color:#8fe08a}
+.tot{font-size:13px;font-weight:700;color:#8fe08a;margin-left:6px}
+.acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.acts button{flex:1;min-width:110px;min-height:42px;border:none;border-radius:9px;font-size:13.5px;font-weight:700;color:#fff}
+.b-ord{background:#E65100}.b-cancel{background:#4a2020;color:#ff9b9b}.b-uch{background:#1B5E20}.b-bry{background:#4527A0}.b-gar{background:#4E342E}.b-edit{background:#243f2c;color:#cfe9d5}.b-again{background:#16301f;color:#a8ddb8;border:1px solid #2f6b3d}
+.sum{margin-top:10px;padding:10px 13px;background:#12262b;border:1px solid #26525c;border-radius:10px;display:flex;justify-content:space-between;align-items:center;gap:10px}
+.sum .lbl{font-size:12px;color:#88a7b5;font-weight:700;text-transform:uppercase;letter-spacing:.04em}
+.sum .val{font-size:20px;font-weight:800;color:#8fe08a}
+.sum .val.zero{color:#5c7480}
+.sum .calc{font-size:11.5px;color:#88a7b5;margin-top:2px;min-height:0}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:55;display:none;align-items:flex-end;justify-content:center}
+.modal.show{display:flex}
+.sheet{background:#141c28;border:1px solid var(--line);border-radius:16px 16px 0 0;width:100%;max-width:640px;max-height:88vh;overflow-y:auto;padding:18px 16px 24px}
+.sheet h3{margin:0 0 4px}
+.mrow{display:flex;gap:10px;margin-top:16px}
+.mrow button{flex:1;min-height:50px;border:none;border-radius:12px;font-size:16px;font-weight:700}
+.m-save{background:var(--acc);color:#fff}.m-cancel{background:#2a3446;color:var(--muted)}
+/* инфо / сводки */
+.kpi{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.kpi.k3{grid-template-columns:1fr 1fr 1fr}
+.kpi .k{background:var(--card);border:1px solid var(--line);border-radius:11px;padding:9px 11px}
+.kpi .k span{display:block;font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.04em;font-weight:800}
+.kpi .k b{display:block;font-size:21px;font-weight:800;margin-top:2px;line-height:1.1}
+.kpi .k b.ok{color:#9be3ac}.kpi .k b.warn{color:#e0a52a}.kpi .k b.bad{color:#ff9b9b}.kpi .k b.blue{color:#7fd4e0}
+.kpi .k i{display:block;font-style:normal;font-size:11px;color:var(--muted);margin-top:2px}
+.to{margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:11px;padding:10px 12px}
+.to .r1{display:flex;justify-content:space-between;align-items:flex-start;gap:8px}
+.to .nm{font-weight:700;font-size:14px}
+.to .mt{font-size:12px;color:var(--muted);margin-top:2px}
+.fuel{display:flex;gap:8px}
+.fuel button{flex:1;min-height:52px;border:1px solid var(--line);border-radius:12px;background:var(--card);color:var(--muted);font-size:18px;font-weight:800}
+.fuel button small{display:block;font-size:11px;font-weight:600}
+.fuel button.on{border-color:#5fd08a;background:#12330f;color:#9be3ac}
+.off{margin-top:14px;padding:14px 16px;border:1px dashed var(--amber);border-radius:12px;background:#1c1710;color:#e8d9ae;font-size:14px;line-height:1.5}
+.off b{color:#fff}
+/* подтверждение смены: карточки блоков других людей, замер топлива */
+.sbtn{min-height:34px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);font-size:12.5px;font-weight:600;padding:0 10px;white-space:nowrap}
+.sbtn.on{border-color:#5fd08a;background:#12330f;color:#9be3ac}
+.smo{margin-top:8px;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.smo .r1{display:flex;align-items:center;gap:8px}
+.smo .ic{font-size:22px;flex:0 0 30px;text-align:center}
+.smo .t{flex:1;min-width:0}
+.smo .t b{display:block;font-size:14px;font-weight:700;line-height:1.3}
+.smo .t span{display:block;font-size:12.5px;color:var(--muted);margin-top:2px;line-height:1.35}
+.smo.ok{border-color:#23502f}.smo.warn{border-color:#5c4a1e;background:#2b2416}.smo.wait{border-color:#3d4a6a}
+.smo .pill{margin-top:6px;display:inline-block}
+.conf-tog{display:flex;align-items:center;gap:10px;margin-top:10px;padding:10px 12px;border:1px solid var(--line);border-radius:12px;background:var(--card)}
+.conf-tog .chk{width:26px;height:26px;border-radius:7px;border:2px solid var(--muted);flex:0 0 26px;display:flex;align-items:center;justify-content:center;font-size:16px;color:transparent}
+.conf-tog.on{border-color:#5fd08a;background:#12330f}.conf-tog.on .chk{border-color:#5fd08a;background:#5fd08a;color:#0b1a0e}
+.conf-tog .t{flex:1;font-size:14px;font-weight:700}.conf-tog .t small{display:block;font-weight:500;color:var(--muted);font-size:12px}
+.stock{margin-top:10px;background:#12270d;border:1px solid #23502f;border-radius:12px;padding:10px 12px;display:flex;align-items:center;gap:10px}
+.stock .t{flex:1;font-size:14px;color:#bfe6c9}.stock .t b{color:#fff;font-size:16px}.stock .t small{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+.stock.low{border-color:#5c4a1e;background:#2b2416;color:#e8d9ae}
+</style>
+</head>
+<body>
+<!-- ======= ВХОД ======= -->
+<div class="login" id="login"><div class="box">
+  <h2>🌲 ГЕО</h2>
+  <div class="h">Кто работает?</div>
+  <div class="field"><label>Сотрудник</label>
+    <div style="display:flex;gap:6px">
+      <select id="lg-who" style="flex:1"><option value="">загрузка…</option></select>
+      <button onclick="loadWho()" style="min-height:48px;min-width:48px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font-size:16px">↻</button>
+    </div>
+  </div>
+  <div class="field"><label>PIN</label>
+    <div class="pinrow"><input id="lg-pin" type="password" inputmode="numeric" maxlength="6" placeholder="••••"></div>
+    <div class="hint">Спрашивается раз в день. Если PIN ещё не выдали — оставь пустым.</div>
+  </div>
+  <button class="save" onclick="doLogin()">Войти</button>
+  <div class="err" id="lg-err"></div>
+  <details><summary>⚙ Подключение (ЗКС)</summary><div class="setup"><label>WA таблицы ЗКС</label><input id="wa-lg" type="url" placeholder="https://script.google.com/…/exec" onchange="saveWA('wa-lg','zksWA')"></div></details>
+</div></div>
+
+<header>
+  <div class="wrap">
+    <h1><span>🌲 ГЕО</span><small id="hdr-ver"></small></h1>
+    <div class="me"><span id="sub">Главная</span><span><span id="me-name"></span> <button onclick="logout()">выйти</button></span></div>
+    <div class="tabs" id="tabs"></div>
+  </div>
+</header>
+
+<!-- ======= ГЛАВНАЯ ======= -->
+<div class="view on" id="v-home"><div class="wrap">
+  <div class="ord-head"><span id="home-cnt"></span><button class="refresh" onclick="refreshHome(1)">↻ Обновить</button></div>
+  <div id="home-cards"><div class="empty">Загружаю…</div></div>
+  <div id="home-mach"></div>
+  <div class="hint" id="home-ver" style="margin-top:18px;text-align:center;cursor:pointer" onclick="diagOpen()"></div>
+</div></div>
+
+<!-- ======= СМЕНА ======= -->
+<div class="view" id="v-sm"><div class="wrap">
+  <div class="field"><label>Дата</label><input id="sm-d" type="date" onchange="smDateChanged()"></div>
+  <div class="hint" id="sm-last"></div>
+  <div id="sm-others"></div>
+  <div id="sec-bul">
+    <div class="sec">🚜 Бульдозер Komatsu D65</div>
+    <div class="hand am" id="bul-edit" style="display:none;margin-top:8px;font-size:13px"></div>
+    <div class="rowf"><div class="field"><label>М/ч нач</label><input id="bul-ms" type="number" placeholder="9166"></div><div class="field"><label>М/ч кон</label><input id="bul-me" type="number" placeholder="9173"></div></div>
+    <div class="rowf"><div class="field"><label>Бак нач, л</label><input id="bul-fs" type="number" placeholder="200" oninput="calcF('bul')"></div><div class="field"><label>Залито, л</label><input id="bul-fz" type="number" placeholder="0" oninput="calcF('bul')"></div><div class="field"><label>Бак кон, л</label><input id="bul-fe" type="number" placeholder="40" oninput="calcF('bul')"></div></div>
+    <div class="calc" id="bul-fc"></div>
+    <div class="field"><label>Осмотр (масло, уровни)</label>
+      <div class="ztog" style="margin-top:0"><button id="bul-osm-ok" onclick="osm('bul','ok')">✅ Всё ок</button><button id="bul-osm-bad" onclick="osm('bul','bad')">⚠ Замечания</button></div>
+      <input id="bul-osm-n" placeholder="что не так: уровень масла, течь, шум…" style="display:none;margin-top:8px"></div>
+  </div>
+  <div id="sec-eks">
+    <div class="sec">⚙️ Экскаватор XCMG XE180DN</div>
+    <div class="hand am" id="eks-edit" style="display:none;margin-top:8px;font-size:13px"></div>
+    <div class="rowf"><div class="field"><label>М/ч нач</label><input id="eks-ms" type="number" placeholder="494"></div><div class="field"><label>М/ч кон</label><input id="eks-me" type="number" placeholder="501"></div></div>
+    <div class="rowf"><div class="field"><label>Бак нач, л</label><input id="eks-fs" type="number" placeholder="100" oninput="calcF('eks')"></div><div class="field"><label>Залито, л</label><input id="eks-fz" type="number" placeholder="0" oninput="calcF('eks')"></div><div class="field"><label>Бак кон, л</label><input id="eks-fe" type="number" placeholder="30" oninput="calcF('eks')"></div></div>
+    <div class="calc" id="eks-fc"></div>
+    <div class="field"><label>Осмотр (масло, уровни)</label>
+      <div class="ztog" style="margin-top:0"><button id="eks-osm-ok" onclick="osm('eks','ok')">✅ Всё ок</button><button id="eks-osm-bad" onclick="osm('eks','bad')">⚠ Замечания</button></div>
+      <input id="eks-osm-n" placeholder="что не так: уровень масла, течь, шум…" style="display:none;margin-top:8px"></div>
+  </div>
+  <div id="sec-bag">
+    <div class="sec">🏍️ Багги BRP Traxter XMR</div>
+    <div class="hand am" id="bag-edit" style="display:none;margin-top:8px;font-size:13px"></div>
+    <div class="rowf"><div class="field"><label>М/ч нач</label><input id="bag-ms" type="number" step="0.1" placeholder="279.6"></div><div class="field"><label>М/ч кон</label><input id="bag-me" type="number" step="0.1" placeholder="283.8"></div></div>
+    <div class="rowf"><div class="field"><label>Бак нач, л</label><input id="bag-fs" type="number" step="0.5" placeholder="20" oninput="calcF('bag')"></div><div class="field"><label>Залито, л</label><input id="bag-fz" type="number" step="0.5" placeholder="0" oninput="calcF('bag')"></div><div class="field"><label>Бак кон, л</label><input id="bag-fe" type="number" step="0.5" placeholder="10" oninput="calcF('bag')"></div></div>
+    <div class="calc" id="bag-fc"></div>
+    <div class="field"><label>Осмотр (масло, уровни)</label>
+      <div class="ztog" style="margin-top:0"><button id="bag-osm-ok" onclick="osm('bag','ok')">✅ Всё ок</button><button id="bag-osm-bad" onclick="osm('bag','bad')">⚠ Замечания</button></div>
+      <input id="bag-osm-n" placeholder="что не так: уровень масла, течь, шум…" style="display:none;margin-top:8px"></div>
+  </div>
+  <div id="blk-fuel">
+    <div class="sec">⛽ Прочее топливо</div>
+    <div class="rowf"><div class="field"><label>Дизель, л</label><input id="sm-dp" type="number" step="0.5" placeholder="0"></div><div class="field"><label>Бензин, л</label><input id="sm-bp" type="number" step="0.5" placeholder="0"></div></div>
+    <div class="field"><label>Куда (на что)</label><input id="sm-kuda" placeholder="бензопилы, генератор…"></div>
+  </div>
+  <div id="blk-dop">
+    <div class="sec">Дополнительно</div>
+    <div class="rowf"><div class="field" id="blk-rash"><label>Расходники (руб)</label><input id="sm-rash" type="number" step="100" placeholder="0"></div><div class="field" id="blk-note"><label>Примечание</label><input id="sm-note" placeholder="замечания, события…"></div></div>
+  </div>
+  <div id="blk-photo">
+    <button class="photo-btn" id="sm-pb" onclick="pick('sm')">🚁 Фото с коптера / смены</button>
+    <img class="prev" id="sm-prev">
+  </div>
+  <div class="hint" id="sm-empty" style="display:none">Блоки смены тебе не открыты — только машины.</div>
+  <div class="hint">Гектары не вводятся — их посчитает приложение бульдозера.</div>
+  <div class="conf-tog on" id="sm-conf" style="display:none" onclick="smConfToggle()"><div class="chk">✓</div><div class="t">Подтверждаю смену за <span id="sm-conf-d"></span><small id="sm-conf-s">все записанные блоки — ок</small></div></div>
+  <details><summary>⚙ Подключение (Журнал основа)</summary><div class="setup"><label>WA журнала смен / заправок</label><input id="wa-sm" type="url" placeholder="https://script.google.com/…/exec" onchange="saveWA('wa-sm','brigWA')"><div class="hint" id="sm-hint"></div></div></details>
+  <div style="height:14px"></div>
+</div></div>
+
+<!-- ======= ЗАРЯДКА ======= -->
+<div class="view" id="v-zr"><div class="wrap">
+  <div class="ztog"><button id="zt-mech" class="on" onclick="setMethod('меч')">🔩 Меч Колесова</button><button id="zt-nas" onclick="setMethod('насадка')">🌀 Насадка</button></div>
+  <div class="field"><label>Мой участок</label>
+    <select id="zr-uch" style="display:none"><option value=""></option></select>
+    <div class="ucs" id="zr-ucs"><div style="color:var(--muted);font-size:14px">загрузка участков…</div></div>
+    <div style="display:flex;justify-content:flex-end;margin-top:6px"><button onclick="reloadUch()" style="min-height:34px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:var(--muted);font-size:12px;padding:0 10px">↻ обновить участки</button></div>
+  </div>
+  <div class="field"><label>Дата</label><input id="zr-d" type="date"></div>
+  <table class="z-table">
+    <thead><tr><th>#</th><th>Время</th><th>Заряжено, шт</th><th>Брак, шт</th></tr></thead>
+    <tbody id="z-rows"></tbody>
+  </table>
+  <button class="photo-btn" style="border-style:solid" onclick="addZRow()">＋ Добавить строку</button>
+  <div class="calc" id="zr-calc"></div>
+  <details><summary>⚙ Подключение (Зарядка)</summary><div class="setup"><label>WA таблицы ЗКС</label><input id="wa-zr" type="url" placeholder="https://script.google.com/…/exec" onchange="saveWA('wa-zr','zksWA')"><div class="hint" id="zr-hint"></div></div></details>
+  <div style="height:14px"></div>
+</div></div>
+<!-- ======= САЖЕНЦЫ ======= -->
+<div class="view" id="v-sz"><div class="wrap">
+  <div class="szt" id="sub-sz"></div>
+
+  <!-- заявка -->
+  <div id="sz-req" style="display:none">
+    <div class="hand" id="sz-hand">…</div>
+    <div class="field"><label>Сколько нужно, шт</label><input id="sz-need" type="number" inputmode="numeric" placeholder="6000"></div>
+    <div class="field"><label>Комментарий</label><input id="sz-note" placeholder="куда, к какому дню — необязательно"></div>
+    <div class="hint" style="margin-top:10px">Заявка уйдёт доставщику. Когда он ответит «везу» — партия появится в «Мои партии», там нажмёшь «получил».</div>
+  </div>
+
+  <!-- мои партии -->
+  <div id="sz-mine" style="display:none">
+    <div class="hand" id="sz-hand2">…</div>
+    <div class="ord-head"><span id="sz-mcount"></span><button class="refresh" onclick="loadSz()">↻ Обновить</button></div>
+    <div id="sz-cards"></div>
+  </div>
+
+  <!-- заявки на доставку -->
+  <div id="sz-deliver" style="display:none">
+    <div id="sz-zl">
+      <div class="ord-head"><span id="sz-zcount"></span><button class="refresh" onclick="loadZayavki()">↻ Обновить</button></div>
+      <div id="sz-zlist"></div>
+    </div>
+    <div id="sz-ans" style="display:none">
+      <button class="back" onclick="szView('list')">‹ к заявкам</button>
+      <div class="zk open" id="aHead"></div>
+      <div class="field"><label>Питомник</label>
+        <select id="sup" onchange="onSup()"><option value="">— выбери питомник —</option></select>
+      </div>
+      <div class="hint" id="supHint"></div>
+      <div class="sec">📥 Взял с питомника</div>
+      <div class="rowf">
+        <div class="field"><label>Ящиков</label><input id="nBox" type="number" inputmode="numeric" placeholder="0" oninput="calcSht()"></div>
+        <div class="eq">×</div>
+        <div class="field"><label>Штук в ящике</label><input id="nPer" type="number" inputmode="numeric" placeholder="0" oninput="calcSht()"></div>
+      </div>
+      <div class="field"><label>Всего штук <span class="tag t-auto">считается</span></label>
+        <input id="nSht" class="auto" type="number" inputmode="numeric" placeholder="0" oninput="markManual()"></div>
+      <div class="calc" id="nCalc"></div>
+      <div class="field"><label>Накладная / УПД № <span class="tag t-opt">можно потом</span></label>
+        <input id="nInv" type="text" placeholder="если документ уже на руках"></div>
+      <button class="photo-btn" id="nDocBtn" onclick="pickFile('nd')">📄 Фото или файл накладной</button>
+      <button class="photo-btn" id="nPhotoBtn" onclick="pickPhoto('n')">📷 Фото ящиков в питомнике</button>
+      <img class="prev" id="nPrev">
+      <div class="hint" style="margin-top:14px">Время проставится само. Бригадир подтвердит получение у себя.</div>
+    </div>
+  </div>
+
+  <!-- все партии -->
+  <div id="sz-all" style="display:none">
+    <div id="sz-pl">
+      <div class="ord-head"><span id="sz-pcount"></span><button class="refresh" onclick="loadPartii()">↻ Обновить</button></div>
+      <div id="sz-plist"></div>
+    </div>
+    <div id="sz-inv" style="display:none">
+      <button class="back" onclick="szView('list')">‹ к партиям</button>
+      <h2 style="margin:2px 0 0;font-size:19px" id="iTitle">Накладная к партии</h2>
+      <div class="hint" id="iSub"></div>
+      <div class="field"><label>Накладная / УПД №</label><input id="iInv" type="text" placeholder="номер документа"></div>
+      <button class="photo-btn" id="iDocBtn" onclick="pickFile('id')">📄 Фото или файл (PDF) накладной</button>
+      <img class="prev" id="iPrev">
+      <div class="hand" style="margin-top:16px">Здесь можно только добавить накладную. Количество, питомник и даты правит руководитель в таблице.</div>
+    </div>
+  </div>
+  <div style="height:14px"></div>
+</div></div>
+
+<!-- ======= ТОПЛИВО ======= -->
+<div class="view" id="v-fu"><div class="wrap">
+  <div class="szt" id="sub-fu"></div>
+  <div id="fu-stock"></div>
+  <div id="fu-meas" style="display:none">
+    <div class="sec">📏 Замер — сколько в бочке по факту</div>
+    <div class="field"><label>Топливо</label><div class="fuel"><button id="fm-dt" class="on" onclick="fmFuel('ДТ')">ДТ<small>дизель</small></button><button id="fm-ai" onclick="fmFuel('АИ-92')">АИ-92<small>бензин</small></button></div></div>
+    <div class="rowf"><div class="field"><label>В бочке, л</label><input id="fm-fact" type="number" inputmode="decimal" step="0.5" placeholder="820" oninput="fmCalc()"></div><div class="field"><label>На конец дня</label><input id="fm-d" type="date"></div></div>
+    <div class="field"><label>Комментарий</label><input id="fm-note" placeholder="необязательно"></div>
+    <div class="calc" id="fm-calc"></div>
+    <div style="display:flex;gap:8px;margin-top:10px"><button class="sbtn on" style="flex:1;min-height:46px;font-size:15px" onclick="fmSend(this)">✓ Записать замер</button><button class="sbtn" style="min-height:46px" onclick="fmClose()">отмена</button></div>
+    <div class="hint">Замер делай вечером после смены: с него пойдёт новый отсчёт, залитое за этот день уже учтено в бочке. Разница с расчётом покажет, сколько «ушло мимо журнала».</div>
+  </div>
+  <div class="off" id="fu-off" style="display:none"><b>⛽ Топливо ещё не подключено.</b><br>Экраны готовы, ждём обновление кода «Журнала основы». Как только сервер ответит — всё заработает само, приложение менять не надо.</div>
+
+  <!-- заявка -->
+  <div id="fu-req" style="display:none">
+    <div class="hand" id="fu-hand">…</div>
+    <div class="field"><label>Топливо</label>
+      <div class="fuel"><button id="ft-dt" class="on" onclick="setFuel('ДТ')">ДТ<small>дизель</small></button><button id="ft-ai" onclick="setFuel('АИ-92')">АИ-92<small>бензин</small></button></div>
+    </div>
+    <div class="field"><label>Сколько нужно, л</label><input id="fu-need" type="number" inputmode="numeric" placeholder="200"></div>
+    <div class="field"><label>Комментарий</label><input id="fu-note" placeholder="к утру, где стою — необязательно"></div>
+    <div class="hint" style="margin-top:10px">Заявка уйдёт тому, кто возит топливо. Когда он ответит «везу» — появится в «Мои заправки», там нажмёшь «получил». В технику заливаешь сам — это в «Смене».</div>
+  </div>
+
+  <!-- мои заправки -->
+  <div id="fu-mine" style="display:none">
+    <div class="hand" id="fu-hand2">…</div>
+    <div class="ord-head"><span id="fu-mcount"></span><button class="refresh" onclick="loadFu()">↻ Обновить</button></div>
+    <div id="fu-cards"></div>
+  </div>
+
+  <!-- заявки на доставку -->
+  <div id="fu-deliver" style="display:none">
+    <div id="fu-zl">
+      <div class="ord-head"><span id="fu-zcount"></span><button class="refresh" onclick="loadFuZayavki()">↻ Обновить</button></div>
+      <div id="fu-zlist"></div>
+    </div>
+    <div id="fu-ans" style="display:none">
+      <button class="back" onclick="fuView('list')">‹ к заявкам</button>
+      <div class="zk open" id="fHead"></div>
+      <div class="field"><label>Литров</label><input id="fLit" type="number" inputmode="decimal" step="0.1" placeholder="0" oninput="calcFu()"></div>
+      <div class="field"><label>Заправка</label>
+        <select id="fAzs" onchange="azsPick('f')"><option value="">— выбери АЗС —</option></select>
+        <input id="fAzsNew" placeholder="название новой АЗС" style="display:none;margin-top:8px">
+      </div>
+      <div class="field"><label>Цена, ₽/л</label><input id="fPrice" type="number" inputmode="decimal" step="0.01" placeholder="0,00" oninput="calcFu()"></div>
+      <div class="calc" id="fCalc"></div>
+      <div class="hint" style="margin-top:12px">Больше ничего. Бригадир подтвердит получение у себя.</div>
+    </div>
+  </div>
+
+  <!-- все заправки -->
+  <div id="fu-all" style="display:none">
+    <div class="ord-head"><span id="fu-acount"></span><button class="refresh" onclick="loadFuAll()">↻ Обновить</button></div>
+    <div id="fu-alist"></div>
+  </div>
+  <div style="height:14px"></div>
+</div></div>
+<!-- ======= ЗАКУПКИ ======= -->
+<div class="view" id="v-zk"><div class="wrap">
+  <div class="szt" id="sub-zk"></div>
+
+  <!-- заказать -->
+  <div id="zk-order" style="display:none">
+  <div class="field srch"><label>Наименование</label>
+    <input id="zk-nm" autocomplete="off" placeholder="начни вводить — найдёт в каталоге" oninput="srch()" onfocus="srch()">
+    <div class="dd" id="zk-dd" style="display:none"></div>
+  </div>
+  <div class="rowf"><div class="field"><label>Кол-во</label><input id="zk-qty" type="number" placeholder="1" oninput="zkSum()"></div><div class="field"><label>Ед</label><input id="zk-unit" placeholder="шт"></div><div class="field"><label>Цена, ₽</label><input id="zk-price" type="number" placeholder="0" oninput="zkSum()"></div></div>
+  <div class="sum" id="zk-sum-box"><div><div class="lbl">Сумма</div><div class="calc" id="zk-sum-calc"></div></div><div class="val zero" id="zk-sum">—</div></div>
+  <div class="rowf"><div class="field"><label>Техника</label><select id="zk-tech" onchange="fillNodes('zk-tech','zk-node')"><option>Саженцы</option><option>Komatsu D65</option><option>XCMG XE180DN</option><option>Traxter XMR</option><option>Посадочная SCB160</option><option>Ford F-350</option><option>Toyota Prado</option><option>Toyota Caldina</option><option>VW Caravelle</option><option>Прицеп</option><option>Генератор 4кВт</option><option>Топливо дизель</option><option>Топливо бензин</option><option>Быт/Общее</option></select></div>
+  <div class="field"><label>Узел / агрегат</label><select id="zk-node"></select></div></div>
+  <div class="field"><label>Ссылка на товар</label>
+    <div style="display:flex;gap:6px">
+      <input id="zk-link" type="url" placeholder="вставь ссылку — подтянет название, цену и фото" style="flex:1" oninput="linkTyped()">
+      <button type="button" id="zk-pull" onclick="pullLink(1)" style="min-height:48px;min-width:54px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:#8fc9e8;font-size:19px;font-weight:700">⤵</button>
+    </div>
+    <div class="hint" id="zk-lstat"></div>
+  </div>
+  <div class="field"><label>Комментарий</label><input id="zk-comm" placeholder="необязательно"></div>
+  <img id="zk-prev" style="display:none;max-width:130px;max-height:130px;border-radius:8px;border:1px solid var(--line);margin-top:10px">
+  </div>
+
+  <!-- мои заказы -->
+  <div id="zk-mine" style="display:none">
+    <div id="zk-alert" class="hand am" style="display:none;cursor:pointer" onclick="focusReceive()"></div>
+    <div style="display:flex;gap:7px;margin-top:12px">
+      <input id="zk-q" placeholder="поиск: название, №, техника, узел, статус…" oninput="drawOrders()" style="flex:1;min-height:46px">
+      <button onclick="clearQ()" style="min-height:46px;min-width:48px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);font-size:17px">✕</button>
+    </div>
+    <div class="chips" id="zk-fchips"></div>
+    <div class="ord-head"><span id="zk-ocount"></span><button class="refresh" onclick="loadOrders()">↻ Обновить</button></div>
+    <div id="zk-olist"></div>
+  </div>
+
+  <!-- каталог -->
+  <div id="zk-cat" style="display:none">
+    <div style="display:flex;gap:7px;margin-top:12px">
+      <input id="zc-q" placeholder="что искать в каталоге: название, техника, узел" oninput="drawCat()" style="flex:1;min-height:46px">
+      <button onclick="document.getElementById('zc-q').value='';drawCat()" style="min-height:46px;min-width:48px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:var(--muted);font-size:17px">✕</button>
+    </div>
+    <div class="chips" id="zc-chips"></div>
+    <div class="ord-head"><span id="zc-cnt"></span><button class="refresh" onclick="loadCat()">↻ Обновить</button></div>
+    <div id="zc-list"></div>
+  </div>
+
+  <!-- заявки — надо купить (закупщик) -->
+  <div id="zk-req" style="display:none">
+    <div style="display:flex;gap:7px;margin-top:12px">
+      <input id="zq-q" placeholder="название, №, техника, узел, коммент…" oninput="drawZq()" style="flex:1;min-height:46px">
+      <button class="refresh" onclick="loadOrders()">↻</button>
+    </div>
+    <div class="chips" id="zq-chips"></div>
+    <div class="chips" id="zq-nchips"></div>
+    <div class="hand" id="zq-tot" style="display:none"></div>
+    <div id="zq-list"><div class="empty">Загрузка…</div></div>
+  </div>
+
+  <!-- заказано (закупщик) -->
+  <div id="zk-ordered" style="display:none">
+    <div style="display:flex;gap:7px;margin-top:12px">
+      <input id="zo-q" placeholder="название, №, техника, узел, коммент…" oninput="drawZo()" style="flex:1;min-height:46px">
+      <button class="refresh" onclick="loadOrders()">↻</button>
+    </div>
+    <div class="chips" id="zo-chips"></div>
+    <div class="chips" id="zo-nchips"></div>
+    <div id="zo-list"><div class="empty">Загрузка…</div></div>
+    <div class="hint" style="margin-top:12px">Цепочка: надо купить → заказано → склад (Брянская / гараж / участок) → принято бригадиром.</div>
+  </div>
+
+  <!-- поиск везде (закупщик) -->
+  <div id="zk-search" style="display:none">
+    <div style="display:flex;gap:7px;margin-top:12px">
+      <input id="zs-q" placeholder="ищу везде: №, название, техника, узел, статус, коммент, сайт…" oninput="drawZs()" style="flex:1;min-height:46px">
+      <button class="refresh" onclick="loadOrders();loadCat()">↻</button>
+    </div>
+    <div class="chips" id="zs-chips"></div>
+    <div class="chips" id="zs-nchips"></div>
+    <div class="hint" id="zs-count"></div>
+    <div id="zs-list"><div class="empty">Начни печатать — найду по всем заявкам и каталогу</div></div>
+  </div>
+
+  <details><summary>⚙ Подключение (Закупки)</summary><div class="setup"><label>WA таблицы Закупок</label><input id="wa-zk" type="url" placeholder="https://script.google.com/…/exec" onchange="saveWA('wa-zk','zakWA')"><div class="hint" id="zk-hint"></div></div></details>
+  <div style="height:14px"></div>
+</div></div>
+
+<!-- ======= ТЕХНИКА ======= -->
+<div class="view" id="v-te"><div class="wrap">
+  <!-- список машин -->
+  <div id="te-list">
+    <div class="hint" style="margin-top:10px">Показаны машины, которые открыты тебе в «Доступе».</div>
+    <div id="te-cards"></div>
+    <div class="sec" style="margin-top:18px">🔧 Ремонты в работе</div>
+    <div id="te-reps"><div class="hint">загрузка…</div></div>
+    <details><summary>⚙ Подключение (Ремонт)</summary><div class="setup"><label>WA сервера ремонта</label><input id="wa-rm" type="url" placeholder="https://script.google.com/…/exec" onchange="saveWA('wa-rm','remWA')"></div></details>
+  </div>
+
+  <!-- карточка машины -->
+  <div id="te-card" style="display:none">
+    <button class="back" onclick="teView('list')">‹ к машинам</button>
+    <div class="zk open" id="te-head"></div>
+    <div id="te-body"></div>
+    <div style="display:flex;gap:8px;margin-top:12px" id="te-btns"></div>
+    <div class="sec" style="margin-top:16px">🔧 Ремонты этой машины</div>
+    <div id="te-reps1"><div class="hint">загрузка…</div></div>
+  </div>
+
+  <!-- новый ремонт -->
+  <div id="rm-new" style="display:none">
+    <button class="back" onclick="teView(TE_CUR?'card':'list')">‹ назад</button>
+    <div class="field"><label>Техника</label><select id="rm-tech">
+      <option>Бульдозер Komatsu D65</option><option>Экскаватор XCMG XE180DN</option>
+      <option>Багги BRP Traxter XMR</option><option>Посадочная машина SCB160</option><option>Ford F-350</option>
+      <option>Toyota Prado</option><option>Toyota Caldina</option>
+      <option>VW Caravelle</option><option>Прицеп</option><option>Генератор</option>
+    </select></div>
+    <div class="field"><label>М/ч текущие</label><input id="rm-mch" type="number" placeholder="0"></div>
+    <div class="field"><label>Что сломалось</label><input id="rm-fault" placeholder=""></div>
+    <button class="photo-btn" id="rm-pb" onclick="pick('rm')">📷 Фото поломки (необязательно)</button>
+    <img class="prev" id="rm-prev">
+    <div style="margin-top:14px;padding:12px;border:1px dashed var(--line);border-radius:12px">
+      <div style="font-weight:700;font-size:14px;margin-bottom:4px">🛒 Заказать детали сразу (необязательно)</div>
+      <div class="hint" style="margin-bottom:8px">Если заказать — заявка встанет в «Ждёт запчасть». Без заказа — «Диагностика», дозаказать можно потом.</div>
+      <div id="rm-parts-list"></div>
+      <button onclick="addRmPartRow()" style="min-height:40px;border:1px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);font-weight:600;padding:0 14px;margin-top:6px">＋ Добавить деталь</button>
+    </div>
+    <div style="height:14px"></div>
+  </div>
+</div></div>
+
+<!-- ======= ИНФО ======= -->
+<div class="view" id="v-info"><div class="wrap">
+  <div class="ord-head"><span>Только чтение</span><button class="refresh" onclick="loadInfo()">↻ Обновить</button></div>
+  <div id="info-body"><div class="empty">Загружаю…</div></div>
+</div></div>
+
+<!-- ======= СВОДКИ ======= -->
+<div class="view" id="v-svod"><div class="wrap">
+  <div class="ord-head"><span id="svod-when"></span><button class="refresh" onclick="loadSvod()">↻ Обновить</button></div>
+  <div id="svod-body"><div class="empty">Загружаю…</div></div>
+</div></div>
+
+<!-- модалка: выполнено -->
+<div id="rm-finish-modal" class="modal">
+  <div class="sheet">
+    <h3 id="rmf-title">Выполнено</h3>
+    <div class="field"><label>Что сделали</label><input id="rmf-work" placeholder=""></div>
+    <div class="field"><label>Запчасти (что ушло)</label><input id="rmf-parts" placeholder=""></div>
+    <button class="photo-btn" id="rmf-pb" onclick="pick('rmf')">📷 Фото как починил (необязательно)</button>
+    <img class="prev" id="rmf-prev">
+    <div class="mrow"><button class="m-cancel" onclick="closeRmFinish()">Отмена</button><button class="m-save" onclick="submitRmFinish()">✓ Завершить</button></div>
+  </div>
+</div>
+
+<!-- модалка: заказать деталь к ремонту -->
+<div id="rm-part-modal" class="modal">
+  <div class="sheet">
+    <h3>🛒 Заказать деталь</h3>
+    <div class="hint" id="rmp-sub"></div>
+    <div class="field"><label>Название детали</label><input id="rmp-name" placeholder=""></div>
+    <div class="rowf"><div class="field"><label>Кол-во</label><input id="rmp-qty" type="number" placeholder="1"></div>
+      <div class="field"><label>Ед.</label><input id="rmp-unit" placeholder="шт"></div></div>
+    <div class="field"><label>Узел / агрегат</label><select id="rmp-node"></select></div>
+    <div class="field"><label>Ссылка на товар</label>
+      <div style="display:flex;gap:6px">
+        <input id="rmp-link" type="url" placeholder="вставь ссылку — подтянет название и цену" style="flex:1">
+        <button type="button" id="rmp-pull" onclick="pullRmp()" style="min-height:46px;min-width:52px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:#8fc9e8;font-size:18px;font-weight:700">⤵</button>
+      </div>
+      <div class="hint" id="rmp-lstat"></div>
+    </div>
+    <div class="field"><label>Цена, ₽ (необязательно)</label><input id="rmp-price" type="number" placeholder="0"></div>
+    <img id="rmp-prev" style="display:none;max-width:110px;max-height:110px;border-radius:8px;border:1px solid var(--line);margin-top:8px">
+    <div class="field"><label>Комментарий (необязательно)</label><input id="rmp-comment" placeholder=""></div>
+    <div class="mrow"><button class="m-cancel" onclick="closeRmPart()">Отмена</button><button class="m-save" style="background:#E65100" onclick="submitRmPart()">Заказать + Ждёт запчасть</button></div>
+  </div>
+</div>
+
+<!-- модалка: правка заявки / товара каталога (закупщик) -->
+<div class="modal" id="modal"><div class="sheet">
+  <h3 id="m-title">Редактировать</h3>
+  <div class="hint" id="m-sub"></div>
+  <div class="field"><label>Название</label><input id="m-name"></div>
+  <div class="field" id="m-qty-f"><label>Количество</label><input id="m-qty" type="number" oninput="calcSum('m')"></div>
+  <div class="field"><label>Цена, ₽ за единицу</label><input id="m-price" type="number" oninput="calcSum('m')"></div>
+  <div class="sum" id="m-sum-box"><div><div class="lbl">Сумма</div><div class="calc" id="m-sum-calc"></div></div><div class="val zero" id="m-sum">—</div></div>
+  <div class="field"><label>Единица</label><input id="m-unit"></div>
+  <div class="field"><label>Техника / категория</label><select id="m-tech" onchange="fillNodes('m-tech','m-node')"></select></div>
+  <div class="field"><label>Узел / агрегат</label><select id="m-node"></select></div>
+  <div class="field"><label>Ссылка на товар</label>
+    <div style="display:flex;gap:6px">
+      <input id="m-link" type="url" style="flex:1" placeholder="вставь ссылку — подтянет название, цену и фото">
+      <button type="button" id="m-pull" onclick="pullInto('m')" style="min-height:48px;min-width:54px;border:1px solid var(--line);border-radius:10px;background:var(--card);color:#8fc9e8;font-size:19px;font-weight:700">⤵</button>
+    </div>
+    <div class="hint" id="m-lstat"></div>
+  </div>
+  <img id="m-prev" style="display:none;max-width:120px;max-height:120px;border-radius:8px;border:1px solid var(--line);margin-top:8px">
+  <div class="field" id="m-comm-f"><label>Комментарий</label><input id="m-comm"></div>
+  <div class="mrow"><button class="m-cancel" onclick="closeModal()">Отмена</button><button class="m-save" id="m-savebtn" onclick="saveEdit()">Сохранить</button></div>
+</div></div>
+
+<div class="bar" id="bar"><div class="wrap"><button class="save" id="saveBtn" onclick="save()">Записать</button></div></div>
+<div class="toast" id="toast"></div>
+<input type="file" id="filePick" accept="image/*" style="display:none">
+<input type="file" id="docPick" accept="image/*,application/pdf" style="display:none">
+<script>
+// ============================================================
+//  ГЕО — единое приложение. Вход один, вкладки — по «Доступу».
+// ============================================================
+var APP_VER='ГЕО v1.2 · 07.10.2026';
+var brigWA='', zksWA='', zakWA='', remWA='';
+var WA_VER='2026-09-07';
+var DEF={
+  brigWA:'https://script.google.com/macros/s/AKfycbz8RkIObVF1f_m9uIfv-mVrn_YGomyHkSNY1zPmOUMqbcIS3e39mA5AvVaMXyCAxfis/exec',
+  zksWA: 'https://script.google.com/macros/s/AKfycbza4dnC-hmj7xpfADYwZoAU-xbiQ61FZ5AEBqt9WXyz7ujrmnjdx7NBBY9uu11A6vXA9Q/exec',
+  zakWA: 'https://script.google.com/macros/s/AKfycbx003NfGSXNtDsG14lmaSZ4gA0LZvVC_l4zfGjLiM-m6k3Q12x_USz9c2P4qKYou6BK2w/exec',
+  remWA: 'https://script.google.com/macros/s/AKfycbyv3LC7-UADECT1FK2XoZeOxYf2tv1Zc3PVjwRkXC8fLt8qAx1NkNxLwKJNqEtQ193Z/exec'
+};
+try{
+  if(localStorage.getItem('wa_ver')!==WA_VER){
+    ['brigWA','zksWA','zakWA','remWA'].forEach(function(k){ localStorage.removeItem(k); });
+    localStorage.setItem('wa_ver',WA_VER);
+  }
+}catch(e){}
+try{ brigWA=localStorage.getItem('brigWA')||''; zksWA=localStorage.getItem('zksWA')||''; zakWA=localStorage.getItem('zakWA')||''; remWA=localStorage.getItem('remWA')||''; }catch(e){}
+if(!brigWA) brigWA=DEF.brigWA;
+if(!zksWA)  zksWA=DEF.zksWA;
+if(!zakWA)  zakWA=DEF.zakWA;
+if(!remWA)  remWA=DEF.remWA;
+
+function $(id){ return document.getElementById(id); }
+function gv(id){ var el=$(id); return el?el.value:''; }
+function sv(id,v){ var el=$(id); if(el) el.value=v; }
+function clr(id){ sv(id,''); }
+function enc(s){ return encodeURIComponent(s==null?'':s); }
+function esc(s){return String(s==null?'':s).replace(/[&<>"]/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c];});}
+function q1(s){ return esc(s).replace(/'/g,"\\'"); }
+function nf(n){ return (Number(n)||0).toLocaleString('ru'); }
+function nfmt(n){ return nf(n); }
+function toast(m,e){var t=$('toast');t.textContent=m;t.className='toast show'+(e?' err':'');setTimeout(function(){t.className='toast';},2500);}
+function todayISO(){ var d=new Date(); return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2); }
+function today_(){ var d=new Date(); return d.getFullYear()+'-'+(d.getMonth()+1)+'-'+d.getDate(); }
+function ddmmyyyy(iso){ var p=String(iso||'').split('-'); return p.length===3?(p[2]+'.'+p[1]+'.'+p[0]):iso; }
+function setBadge(id,n,am){ var b=$(id); if(!b) return; b.textContent=n||''; b.classList.toggle('on',!!n); b.classList.toggle('am',!!am); }
+
+function saveWA(inputId,varName){ var v=gv(inputId).trim();
+  if(varName==='brigWA') brigWA=v; else if(varName==='zksWA') zksWA=v; else if(varName==='zakWA') zakWA=v; else if(varName==='remWA') remWA=v;
+  try{localStorage.setItem(varName,v);}catch(e){} toast('✓ Подключение сохранено');
+}
+function fillWAInputs(){
+  [['wa-lg',zksWA],['wa-sm',brigWA],['wa-zr',zksWA],['wa-zk',zakWA],['wa-rm',remWA]].forEach(function(p){ sv(p[0],p[1]); });
+}
+
+// ---- POST (no-cors) и JSONP ----
+function post(wa,d,done){ fetch(wa,{method:'POST',mode:'no-cors',headers:{'Content-Type':'text/plain'},body:JSON.stringify(d)}).then(done).catch(done); }
+function jsonp(wa,action,extra,done){ var cb='__jp'+Date.now()+Math.floor(Math.random()*100000);
+  var fired=false; function fin(r){ if(fired) return; fired=true; window[cb]=function(){}; done(r); }
+  window[cb]=fin;
+  var s=document.createElement('script');
+  s.src=wa+(wa.indexOf('?')<0?'?':'&')+'action='+action+(extra?('&'+extra):'')+'&callback='+cb;
+  s.onerror=function(){s.remove();fin(null);}; s.onload=function(){s.remove();}; document.body.appendChild(s);
+  setTimeout(function(){ fin(null); }, 25000);
+}
+
+// ============================================================
+//  ⏱ ДИАГНОСТИКА — время каждого запроса к серверам (v1.2, хостинг)
+// ============================================================
+var DIAG=[]; try{ DIAG=JSON.parse(localStorage.getItem('geo_diag')||'[]'); if(!Array.isArray(DIAG)) DIAG=[]; }catch(e){ DIAG=[]; }
+var DIAG_T0=(window.performance&&performance.now)?performance.now():0;
+function diagWho(wa){ wa=String(wa||''); if(wa===zksWA) return 'ЗКС'; if(wa===brigWA) return 'основа'; if(wa===zakWA) return 'закупки'; if(wa===remWA) return 'ремонт'; return wa.replace(/^https?:\/\/script\.google\.com\/macros\/s\//,'').slice(0,10); }
+function diagAdd(rec){ DIAG.push(rec); if(DIAG.length>80) DIAG=DIAG.slice(-80); try{ localStorage.setItem('geo_diag',JSON.stringify(DIAG)); }catch(e){} var d=$('diag'); if(d&&d.classList.contains('on')) diagRender(); }
+(function(){
+  var jsonp0=jsonp, post0=post;
+  jsonp=function(wa,action,extra,done){ var t0=Date.now(), when=new Date();
+    return jsonp0(wa,action,extra,function(r){ var ms=Date.now()-t0;
+      diagAdd({k:'GET',who:diagWho(wa),a:String(action||''),ms:ms,ok:r?(r.ok===false?'ошибка':'ok'):(ms>=24900?'таймаут':'нет ответа'),at:when.toTimeString().slice(0,8)});
+      done(r); }); };
+  post=function(wa,d,done){ var t0=Date.now(), when=new Date(), a=(d&&(d.action||d.type))?String(d.action||d.type):'post';
+    return post0(wa,d,function(r){ var ms=Date.now()-t0; diagAdd({k:'POST',who:diagWho(wa),a:a,ms:ms,ok:'отправлено',at:when.toTimeString().slice(0,8)}); done(r); }); };
+})();
+function diagOpen(){ var d=$('diag'); if(!d) return; d.classList.add('on'); diagRender(); }
+function diagClose(){ var d=$('diag'); if(d) d.classList.remove('on'); }
+function diagClear(){ DIAG=[]; try{ localStorage.removeItem('geo_diag'); }catch(e){} diagRender(); }
+function diagLoadInfo(){
+  var nav=null; try{ nav=(performance.getEntriesByType&&performance.getEntriesByType('navigation')[0])||null; }catch(e){}
+  var fromCache=!!(nav&&nav.transferSize===0&&nav.decodedBodySize>0);
+  var load=nav?Math.round(nav.loadEventEnd||nav.domContentLoadedEventEnd||0):0;
+  var sw=!!(navigator.serviceWorker&&navigator.serviceWorker.controller);
+  var standalone=!!(window.matchMedia&&window.matchMedia('(display-mode: standalone)').matches)||window.navigator.standalone===true;
+  return 'Страница открылась за '+(load||'?')+' мс'+(fromCache?' · из кэша телефона':' · из интернета')+(sw?' · офлайн-кэш включён':' · офлайн-кэш ещё не включён (откройте второй раз)')+(standalone?' · установлено как приложение':' · открыто в браузере');
+}
+function diagRender(){
+  var box=$('diag-body'); if(!box) return;
+  var rows=DIAG.slice().reverse();
+  var byWho={}; DIAG.forEach(function(r){ if(r.k!=='GET') return; var w=byWho[r.who]||(byWho[r.who]={n:0,sum:0,max:0,bad:0}); w.n++; w.sum+=r.ms; w.max=Math.max(w.max,r.ms); if(r.ok!=='ok') w.bad++; });
+  var h='<div class="hint" style="margin-bottom:10px">'+esc(diagLoadInfo())+'</div>';
+  h+='<div class="hint" style="margin-bottom:6px">По серверам (GET-запросы)</div>';
+  var whos=Object.keys(byWho);
+  h+=whos.length?'<table class="diag-t"><tr><th>сервер</th><th>запросов</th><th>в среднем</th><th>дольше всего</th><th>без ответа</th></tr>'+whos.map(function(w){ var s=byWho[w]; return '<tr><td>'+esc(w)+'</td><td>'+s.n+'</td><td>'+(s.sum/s.n/1000).toFixed(1)+' с</td><td>'+(s.max/1000).toFixed(1)+' с</td><td>'+(s.bad||'')+'</td></tr>'; }).join('')+'</table>':'<div class="empty">Запросов ещё не было</div>';
+  h+='<div class="hint" style="margin:12px 0 6px">Последние запросы (новые сверху)</div>';
+  h+=rows.length?'<table class="diag-t"><tr><th>когда</th><th>сервер</th><th>действие</th><th>время</th><th>итог</th></tr>'+rows.map(function(r){ var cls=r.ms>=8000?' bad':(r.ms>=3000?' warn':''); return '<tr class="'+cls+'"><td>'+esc(r.at)+'</td><td>'+esc(r.who)+'</td><td>'+esc(r.k==='POST'?'↑ '+r.a:r.a)+'</td><td>'+(r.ms/1000).toFixed(1)+' с</td><td>'+esc(r.ok)+'</td></tr>'; }).join('')+'</table>':'';
+  box.innerHTML=h;
+}
+function diagText(){
+  var lines=[APP_VER, diagLoadInfo(), navigator.userAgent, ''];
+  DIAG.forEach(function(r){ lines.push(r.at+' | '+r.who+' | '+(r.k==='POST'?'POST ':'')+r.a+' | '+(r.ms/1000).toFixed(1)+' с | '+r.ok); });
+  return lines.join('\n');
+}
+function diagCopy(){ var t=diagText();
+  function ok(){ toast('✓ Скопировано — вставь в чат'); }
+  if(navigator.clipboard&&navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(ok,function(){ diagShare(t); }); } else diagShare(t); }
+function diagShare(t){ if(navigator.share){ navigator.share({title:'Диагностика ГЕО',text:t}).catch(function(){}); } else { var ta=document.createElement('textarea'); ta.value=t; document.body.appendChild(ta); ta.select(); try{ document.execCommand('copy'); toast('✓ Скопировано'); }catch(e){ toast('Не удалось скопировать',1); } ta.remove(); } }
+
+// ============================================================
+//  ВХОД И ДОСТУП
+// ============================================================
+var ME={name:'',day:'',tabs:{},machines:[],uchastki:[],home:null,homeAt:0};
+try{ var m_=JSON.parse(localStorage.getItem('geo_me')||'{}'); if(m_&&m_.name) ME=m_; }catch(e){}
+function saveMe(){ try{ localStorage.setItem('geo_me',JSON.stringify(ME)); }catch(e){} }
+function needLogin(){ return !ME.name || ME.day!==today_(); }
+function showLogin(){ $('login').classList.add('on'); loadWho();
+  if(ME.name) setTimeout(function(){ var s=$('lg-who'); if(s) s.value=ME.name; },700); }
+function hideLogin(){ $('login').classList.remove('on'); }
+function fillWho(items){ var sel=$('lg-who');
+  if(!items.length){ sel.innerHTML='<option value="">⚠ список пуст — нажми ↻</option>'; return; }
+  sel.innerHTML='<option value="">— кто ты —</option>'+items.map(function(b){ return '<option'+(b.name===ME.name?' selected':'')+'>'+esc(b.name)+'</option>'; }).join('');
+}
+function loadWho(){ var sel=$('lg-who'); sel.innerHTML='<option value="">загрузка…</option>';
+  jsonp(zksWA,'people','',function(r){
+    var items=(r&&r.items)||[];
+    if(items.length){ fillWho(items); return; }
+    jsonp(zksWA,'brigady','',function(r2){ fillWho((r2&&r2.items)||[]); });
+  });
+}
+var DEF_TABS={home:true,sm:true,smb:{kopter:true,fuel:true,rash:true,note:true},zr:true,sz:{req:true,mine:true},fu:{req:true,mine:true},zk:{order:true,mine:true,cat:true},info:true};
+function doLogin(){
+  var who=gv('lg-who'), pin=gv('lg-pin'), err=$('lg-err');
+  if(!who){ err.textContent='Выбери себя в списке'; return; }
+  err.textContent='Проверяю…';
+  jsonp(zksWA,'login','name='+enc(who)+'&pin='+enc(pin),function(r){
+    if(!r){ err.textContent='Сервер не ответил. Проверь связь.'; return; }
+    if(!r.ok){ err.textContent=r.error||'Не пустили'; return; }
+    applyLogin(r);
+    sv('lg-pin',''); err.textContent='';
+    hideLogin(); toast('Привет, '+ME.name.split(' ')[0]+'!');
+  });
+}
+function applyLogin(r){
+  ME={name:r.name, day:today_(), tabs:(r.tabs||DEF_TABS), machines:(r.machines||[]), uchastki:(r.uchastki||[]),
+      home:(r.home&&r.home.ok?r.home:null), homeAt:(r.home?Date.now():0), pinSet:!!r.pinSet};
+  saveMe(); MY_UCH=ME.uchastki||[];
+  $('me-name').textContent='👤 '+ME.name;
+  buildTabs(); GT('home'); drawUch();
+}
+function logout(){ ME={name:'',day:'',tabs:{},machines:[],uchastki:[],home:null,homeAt:0}; try{ localStorage.removeItem('geo_me'); }catch(e){} $('me-name').textContent=''; showLogin(); }
+
+// какие вкладки видны
+function has(id){ var t=ME.tabs||{};
+  if(id==='home') return true;
+  if(id==='te') return myMachines().length>0;
+  var v=t[id]; if(!v) return false;
+  if(typeof v==='object'){ for(var k in v) if(v[k]) return true; return false; }
+  return !!v;
+}
+function hasSub(g,k){ var t=ME.tabs||{}; return !!(t[g]&&typeof t[g]==='object'&&t[g][k]); }
+function hasSmc(){ return !!(ME.tabs&&ME.tabs.smc); }   // старший: подтверждает смену
+function dayNum(dd){ var m=String(dd||'').match(/^(\d{2})\.(\d{2})\.(\d{4})/); return m?(+m[3])*10000+(+m[2])*100+(+m[1]):0; }
+function firstSub(g){ var d=SUBDEF[g]||[]; for(var i=0;i<d.length;i++) if(hasSub(g,d[i][0])) return d[i][0]; return ''; }
+
+var TABDEF=[['home','🔔 Главная'],['sm','📅 Смена'],['zr','🌱 Зарядка'],['sz','🌲 Саженцы'],['fu','⛽ Топливо'],['zk','🛒 Закупки'],['te','🚜 Техника'],['info','ℹ️ Инфо'],['svod','📊 Сводки']];
+var LABELS={home:'Главная',sm:'Журнал смен',zr:'Зарядка саженцев',sz:'Саженцы',fu:'Топливо',zk:'Закупки',te:'Техника',info:'Информация',svod:'Сводки'};
+var SUBDEF={
+  sz:[['req','📝 Заявка'],['mine','📦 Мои партии'],['deliver','📋 Заявки на доставку'],['all','🗂 Все партии']],
+  fu:[['req','📝 Заявка'],['mine','⛽ Мои заправки'],['deliver','📋 Заявки на доставку'],['all','🗂 Все заправки']],
+  zk:[['order','📝 Заказать'],['mine','📋 Мои заказы'],['req','📋 Заявки'],['ordered','📦 Заказано'],['cat','🔖 Каталог'],['search','🔍 Поиск']]
+};
+var SUB={sz:'req',fu:'req',zk:'order'};
+var curTab='home', SZV='list', FUV='list';
+
+function buildTabs(){
+  var h='';
+  TABDEF.forEach(function(t){ if(!has(t[0])) return;
+    h+='<button class="tab'+(t[0]===curTab?' on':'')+'" id="tb-'+t[0]+'" onclick="GT(\''+t[0]+'\')">'+t[1]+'<span class="b" id="bd-'+t[0]+'"></span></button>'; });
+  $('tabs').innerHTML=h;
+  ['sz','fu','zk'].forEach(buildSubs);
+  smSections();
+  $('hdr-ver').textContent='';
+}
+function buildSubs(g){ var box=$('sub-'+g); if(!box) return; var h='';
+  SUBDEF[g].forEach(function(s){ if(!hasSub(g,s[0])) return;
+    h+='<button id="st-'+g+'-'+s[0]+'"'+(SUB[g]===s[0]?' class="on"':'')+' onclick="setSub(\''+g+'\',\''+s[0]+'\')">'+s[1]+'<span class="b" id="sb-'+g+'-'+s[0]+'"></span></button>'; });
+  box.innerHTML=h;
+  if(!hasSub(g,SUB[g])) SUB[g]=firstSub(g);
+}
+function GT(id){
+  if(!has(id)) id='home';
+  document.querySelectorAll('.view').forEach(function(v){v.classList.remove('on');});
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('on');});
+  $('v-'+id).classList.add('on');
+  var tb=$('tb-'+id); if(tb){ tb.classList.add('on'); try{ tb.scrollIntoView({inline:'center',block:'nearest'}); }catch(e){} }
+  curTab=id;
+  $('sub').textContent=LABELS[id]||'';
+  if(id==='sz'||id==='fu'||id==='zk') setSub(id,SUB[id]);
+  else if(id==='te') teView(TEV);
+  else if(id==='home') refreshHome(0);
+  else if(id==='sm'){ if(SM_GO_DATE){ sv('sm-d',SM_GO_DATE); SM_GO_DATE=''; } smPrefill(); smDayLoad(); }
+  else if(id==='info') loadInfo();
+  else if(id==='svod') loadSvod();
+  else if(id==='zr'){ if(!MY_UCH.length) loadUchZKS(); else drawUch(); }
+  updBar(); window.scrollTo(0,0);
+}
+function setSub(g,k){
+  if(!hasSub(g,k)) k=firstSub(g);
+  SUB[g]=k;
+  SUBDEF[g].forEach(function(s){ var el=$(g+'-'+s[0]); if(el) el.style.display=(s[0]===k)?'block':'none';
+    var b=$('st-'+g+'-'+s[0]); if(b) b.classList.toggle('on',s[0]===k); });
+  if(g==='sz'){ szView('list'); if(k==='req'||k==='mine') loadSz(); if(k==='deliver') loadZayavki(); if(k==='all') loadPartii(); }
+  if(g==='fu'){ fuView('list'); fuCheck(function(){ if(k==='req'||k==='mine') loadFu(); if(k==='deliver') loadFuZayavki(); if(k==='all') loadFuAll(); }); }
+  if(g==='zk'){
+    if(!ORD.length) loadOrders();
+    if(k==='mine') drawOrders();
+    if(k==='cat'){ if(!CAT.length) loadCat(); drawCat(); }
+    if(k==='req') drawZq();
+    if(k==='ordered') drawZo();
+    if(k==='search'){ drawZs(); var el=$('zs-q'); if(el) el.focus(); }
+  }
+  updBar(); window.scrollTo(0,0);
+}
+function szView(v){ SZV=v;
+  $('sz-zl').style.display=(v==='ans')?'none':'block'; $('sz-ans').style.display=(v==='ans')?'block':'none';
+  $('sz-pl').style.display=(v==='inv')?'none':'block'; $('sz-inv').style.display=(v==='inv')?'block':'none';
+  updBar(); }
+function fuView(v){ FUV=v;
+  $('fu-zl').style.display=(v==='ans')?'none':'block'; $('fu-ans').style.display=(v==='ans')?'block':'none';
+  updBar(); }
+
+// нижняя кнопка — только там, где есть что отправлять
+function updBar(){
+  var t='', show=false;
+  if(curTab==='sm'){ t=(hasSmc()&&SM_CONF)?'Записать и подтвердить смену':'Записать смену'; show=true; }
+  else if(curTab==='zr'){ t='Сохранить зарядку'; show=true; }
+  else if(curTab==='sz'){
+    if(SUB.sz==='req'){ t='Отправить заявку доставщику'; show=true; }
+    else if(SUB.sz==='deliver'&&SZV==='ans'){ t='🚚 Везу'; show=true; }
+    else if(SUB.sz==='all'&&SZV==='inv'){ t='Сохранить накладную'; show=true; }
+  }
+  else if(curTab==='fu'){
+    if(!FU_ON) show=false;
+    else if(SUB.fu==='req'){ t='Отправить заявку'; show=true; }
+    else if(SUB.fu==='deliver'&&FUV==='ans'){ t='⛽ Везу'; show=true; }
+  }
+  else if(curTab==='zk'){ if(SUB.zk==='order'){ t='Отправить заявку'; show=true; } }
+  else if(curTab==='te'){
+    if(TEV==='rm'){ t='Записать ремонт'; show=true; }
+    else if(TEV==='card'&&TE_CUR&&TE_CUR.kind==='car'){ t='Записать заправку'; show=true; }
+  }
+  $('bar').classList.toggle('on',show); $('saveBtn').textContent=t||'Записать';
+  document.body.style.paddingBottom=show?'90px':'24px';
+}
+function save(){
+  var btn=$('saveBtn'); btn.disabled=true; var f=null;
+  if(curTab==='sm') f=saveSm; else if(curTab==='zr') f=saveZr;
+  else if(curTab==='sz'){ f= SUB.sz==='req'?saveSz : (SUB.sz==='deliver'&&SZV==='ans')?sendAnswer : (SUB.sz==='all'&&SZV==='inv')?sendInvoice : null; }
+  else if(curTab==='fu'){ f= SUB.fu==='req'?saveFu : (SUB.fu==='deliver'&&FUV==='ans')?sendFuAnswer : null; }
+  else if(curTab==='zk'){ f= SUB.zk==='order'?saveZk : null; }
+  else if(curTab==='te'){ f= TEV==='rm'?saveRm : (TEV==='card'&&TE_CUR&&TE_CUR.kind==='car')?saveLg : null; }
+  if(f) f(btn); else btn.disabled=false;
+}
+function done_(btn,msg){ btn.disabled=false; toast(msg||'✓ Записано'); }
+
+// ============================================================
+//  ГЛАВНАЯ — карточки с сервера + моя техника
+// ============================================================
+function refreshHome(force){
+  if(!ME.name) return;
+  drawHome();
+  // топливо живёт в «Журнале основы» — карточки собираем на телефоне
+  if(has('fu')) fuCheck(function(){ if(!FU_ON) return;
+    if(hasSub('fu','deliver')) loadFuZayavki(function(){ if(curTab==='home') drawHome(); });
+    if(hasSub('fu','mine')) loadFu(function(){ if(curTab==='home') drawHome(); });
+  });
+  // старший: какие смены ждут подтверждения (Журнал основа)
+  if(hasSmc() && (force || !SMS.length)) jsonp(brigWA,'smena_status','days=4',function(r){ SMS=(r&&r.ok&&r.days)||[]; if(curTab==='home') drawHome(); });
+  var stale=!ME.home || (Date.now()-(ME.homeAt||0))>60000;
+  if(!force && !stale) return;
+  jsonp(zksWA,'home','name='+enc(ME.name),function(r){
+    if(!r||!r.ok){ if(force) toast('Сервер не ответил',true); return; }
+    ME.home=r; ME.homeAt=Date.now();
+    if(r.tabs){ ME.tabs=r.tabs; ME.machines=r.machines||ME.machines; if(r.uchastki){ ME.uchastki=r.uchastki; MY_UCH=r.uchastki; } buildTabs(); }
+    saveMe(); drawHome();
+  });
+}
+function fuHomeCards(){ var out=[]; if(!FU_ON) return out;
+  if(hasSub('fu','deliver')){ var open=FZAY.filter(function(z){return z.status==='заявка';});
+    if(open.length) out.push({kind:'fu',tab:'fu',sub:'deliver',level:'act',n:open.length,title:'Топливо — '+open.length+' '+(open.length===1?'заявка':open.length<5?'заявки':'заявок')+' без ответа',
+      sub_:open.map(function(z){ return z.brigadir.split(' ')[0]+' '+nf(z.need)+' л '+(z.fuel||''); }).join(' · ')});
+    var road=FZAY.filter(function(z){return z.status==='везу';});
+    if(road.length) out.push({kind:'fu',tab:'fu',sub:'all',level:'info',title:'Топливо везу — ждут подтверждения '+road.length,sub_:road.map(function(z){ return nf(z.lit)+' л → '+z.brigadir.split(' ')[0]; }).join(' · ')}); }
+  if(hasSub('fu','mine')) FU.filter(function(z){return z.status==='везу';}).forEach(function(z){
+    out.push({kind:'fu',tab:'fu',sub:'mine',level:'act',n:1,title:'Топливо везут — подтверди',sub_:nf(z.lit)+' л '+(z.fuel||'')+(z.azs?' · '+z.azs:'')+' · заявка № '+z.n}); });
+  return out;
+}
+// карточки старшего: смены без подтверждения, правки после подтверждения
+function smHomeCards(){ var out=[]; if(!hasSmc()) return out; var today=ddmmyyyy(todayISO());
+  SMS.forEach(function(d){
+    if(d.changed&&d.changed.length){ var who=d.changed.map(function(k){ var b=d.blocks[k]||{}; return (b.who?b.who.split(' ')[0]+' ':'')+SM_NAME[k].toLowerCase(); });
+      var allNew=d.changed.every(function(k){ return (d.blocks[k]||{}).action==='записал'; });
+      out.push({kind:'sm',tab:'sm',level:'act',n:d.changed.length,date:d.iso,title:'Смена за '+d.date.slice(0,5)+': '+(allNew?'дописали':'правили')+' после подтверждения — проверь',sub_:who.join(' · ')}); }
+    if(d.pending&&d.pending.length){ var isToday=d.date===today, names=d.pending.map(function(k){ var b=d.blocks[k]||{}; return (b.who?b.who.split(' ')[0]+' — ':'')+SM_NAME[k].toLowerCase(); });
+      out.push({kind:'sm',tab:'sm',level:isToday?'info':'act',n:isToday?0:d.pending.length,date:d.iso,title:isToday?'Смена за сегодня: записали '+d.pending.length+' — проверить и подтвердить':'Смена за '+d.date.slice(0,5)+' не подтверждена',sub_:names.join(' · ')}); }
+  });
+  return out;
+}
+function drawHome(){
+  var h=ME.home, box=$('home-cards');
+  var srv=((h&&h.cards)||[]).filter(function(c){ return !(FU_ON && c.kind==='fu'); });   // топливо считаем на телефоне
+  var cards=srv.concat(fuHomeCards()).concat(smHomeCards()).concat(stockCards());
+  var cnt=(h&&h.count)||0; fuHomeCards().concat(smHomeCards()).concat(stockCards()).forEach(function(c){ if(c.level==='act') cnt+=(c.n||1); });
+  setBadge('bd-home',cnt); $('home-cnt').textContent=cnt?('Ждут тебя: '+cnt):(h?'Всё сделано':'');
+  var order={act:0,warn:1,info:2}, names={act:'Ждут тебя',warn:'Требует внимания',info:'Сейчас'};
+  cards=cards.slice().sort(function(a,b){ return (order[a.level]!=null?order[a.level]:2)-(order[b.level]!=null?order[b.level]:2); });
+  if(!h){ box.innerHTML='<div class="empty">Загружаю…</div>'; }
+  else if(!cards.length){ box.innerHTML='<div class="empty">Ничего не ждёт — всё сделано 👌</div>'; }
+  else {
+    var last='', html='';
+    cards.forEach(function(c){ var lvl=c.level||'info';
+      if(lvl!==last){ html+='<div class="hint" style="margin-top:12px">'+names[lvl]+'</div>'; last=lvl; }
+      var icon={sz:'🌲',fu:'⛽',zk:'🛒',te:'🚜',sm:'📅',svod:'📊'}[c.kind]||'•';
+      var go= c.date ? 'goSm(\''+q1(c.date)+'\')' : 'goCard(\''+q1(c.tab||'')+'\',\''+q1(c.sub||'')+'\')';
+      html+='<div class="uc '+(lvl==='act'?'act':lvl==='warn'?'warn':'')+'" onclick="'+go+'"><div class="th">'+icon+'</div>'
+          +'<div class="t"><b>'+esc(c.title)+'</b><span>'+esc(c.sub_||'')+'</span></div><div class="r'+(lvl==='warn'?' bad':lvl==='info'?' ok':'')+'">'+(c.n?c.n:'→')+'</div></div>';
+    });
+    box.innerHTML=html;
+  }
+  var ms=myMachines(), mb=$('home-mach');
+  mb.innerHTML= ms.length ? '<div class="hint" style="margin-top:14px">Моя техника</div>'+ms.map(function(m){
+      return '<div class="uc" onclick="openMach(\''+q1(m.key)+'\')"><div class="th">'+m.icon+'</div><div class="t"><b>'+esc(m.name)+'</b><span>'+(m.kind==='car'?'заправка · ремонт · запчасти':m.kind==='heavy'?'смена · ремонт · запчасти':'ремонт · запчасти')+'</span></div><div class="r ok">→</div></div>'; }).join('') : '';
+  $('home-ver').textContent=APP_VER+(h&&h.version?' · сервер '+h.version:'')+' · ⏱ диагностика';
+}
+function goCard(tab,sub){ if(!tab||!has(tab)) return; if(sub&&SUBDEF[tab]&&hasSub(tab,sub)) SUB[tab]=sub; GT(tab); }
+
+// ============================================================
+//  ТЕХНИКА — справочник машин
+// ============================================================
+var MACH=[
+ {key:'komatsu',  name:'Komatsu D65',       full:'Бульдозер Komatsu D65',      zk:'Komatsu D65',       rm:'Бульдозер Komatsu D65',      icon:'🚜', kind:'heavy', fuel:'ДТ',    sm:'bul', al:['komatsu','комацу','бульдозер','d65']},
+ {key:'xcmg',     name:'XCMG XE180DN',      full:'Экскаватор XCMG XE180DN',    zk:'XCMG XE180DN',      rm:'Экскаватор XCMG XE180DN',    icon:'⚙️', kind:'heavy', fuel:'ДТ',    sm:'eks', al:['xcmg','экскаватор','xe180']},
+ {key:'brp',      name:'BRP Traxter XMR',   full:'Багги BRP Traxter XMR',      zk:'Traxter XMR',       rm:'Багги BRP Traxter XMR',      icon:'🏍', kind:'heavy', fuel:'АИ-92', sm:'bag', al:['brp','traxter','багги','трактер']},
+ {key:'scb',      name:'Посадочная SCB160', full:'Посадочная машина SCB160',   zk:'Посадочная SCB160', rm:'Посадочная машина SCB160',   icon:'🌱', kind:'other', fuel:'',      al:['scb','посадочн']},
+ {key:'ford',     name:'Ford F-350',        full:'Ford F-350',                 zk:'Ford F-350',        rm:'Ford F-350',                 icon:'🛻', kind:'car',   fuel:'ДТ',    car:'Форд',      al:['ford','форд','f-350','f350']},
+ {key:'prado',    name:'Прадо',             full:'Toyota Prado',               zk:'Toyota Prado',      rm:'Toyota Prado',               icon:'🚙', kind:'car',   fuel:'ДТ',    car:'Прадо',     al:['prado','прадо']},
+ {key:'caldina',  name:'Калдина',           full:'Toyota Caldina',             zk:'Toyota Caldina',    rm:'Toyota Caldina',             icon:'🚗', kind:'car',   fuel:'АИ-92', car:'Калдина',   al:['caldina','калдина']},
+ {key:'caravelle',name:'Каравелла',         full:'VW Caravelle',               zk:'VW Caravelle',      rm:'VW Caravelle',               icon:'🚐', kind:'car',   fuel:'ДТ',    car:'Каравелла', al:['caravelle','каравелла','фольц','vw']},
+ {key:'pricep',   name:'Прицеп',            full:'Прицеп',                     zk:'Прицеп',            rm:'Прицеп',                     icon:'🚚', kind:'other', fuel:'',      al:['прицеп']},
+ {key:'gen',      name:'Генератор',         full:'Генератор 4кВт',             zk:'Генератор 4кВт',    rm:'Генератор',                  icon:'🔌', kind:'other', fuel:'',      al:['генератор']}
+];
+function machOf(s){ var k=String(s||'').toLowerCase().trim(); if(!k) return null;
+  for(var i=0;i<MACH.length;i++){ var m=MACH[i]; if(m.name.toLowerCase()===k||m.full.toLowerCase()===k||m.zk.toLowerCase()===k) return m; }
+  for(var i2=0;i2<MACH.length;i2++){ var m2=MACH[i2]; for(var j=0;j<m2.al.length;j++) if(k.indexOf(m2.al[j])>=0) return m2; }
+  var nm=String(s).trim();
+  return {key:'x_'+k.replace(/[^a-zа-яё0-9]/g,'_'), name:nm, full:nm, zk:nm, rm:nm, icon:'🔧', kind:'other', fuel:'', al:[]};
+}
+function myMachines(){ var out=[], seen={}; (ME.machines||[]).forEach(function(s){ var m=machOf(s); if(m&&!seen[m.key]){ seen[m.key]=1; out.push(m); } }); return out; }
+function machByKey(k){ var ms=myMachines(); for(var i=0;i<ms.length;i++) if(ms[i].key===k) return ms[i]; return null; }
+// в смене показываем только свои тяжёлые машины; если своих нет — все три, как раньше
+function smSections(){ var ms=myMachines().filter(function(m){return m.sm;}); var keys=ms.map(function(m){return m.sm;});
+  // свои машины — свои блоки; старший без машин — только карточки ребят; «исправить / вписать» открывает чужой блок
+  ['bul','eks','bag'].forEach(function(k){ var el=$('sec-'+k); if(el) el.style.display=((!keys.length&&!hasSmc())||keys.indexOf(k)>=0||SM_EDIT[k])?'block':'none';
+    var eh=$(k+'-edit'); if(eh&&!SM_EDIT[k]) eh.style.display='none'; });
+  var ct=$('sm-conf'); if(ct){ ct.style.display=hasSmc()?'flex':'none'; ct.classList.toggle('on',SM_CONF); var cd=$('sm-conf-d'); if(cd) cd.textContent=ddmmyyyy(gv('sm-d')); }
+  // остальные блоки смены — галочки «Смена: блоки» в «Доступе»; старый сервер без них → показываем всё
+  var b=(ME.tabs&&ME.tabs.smb)||null;
+  function show(id,on){ var el=$(id); if(el) el.style.display=on?'':'none'; }
+  show('blk-fuel', !b||!!b.fuel); show('blk-rash', !b||!!b.rash); show('blk-note', !b||!!b.note);
+  show('blk-dop', !b||!!b.rash||!!b.note); show('blk-photo', !b||!!b.kopter);
+  var pb=$('sm-pb'); if(pb && !pb.classList.contains('done')) pb.textContent=(b&&b.kopter&&!b.note&&!b.fuel&&!b.rash)?'🚁 Фото с коптера':'🚁 Фото с коптера / смены';
+  show('sm-empty', !!b && !b.fuel && !b.rash && !b.note && !b.kopter);
+}
+
+// ---- Смена (старая форма, без гектаров) ----
+function smVisible(m){ var el=$('sec-'+m); return !!el && el.style.display!=='none'; }
+// «нач.» подставляем с прошлой смены (Журнал основа: last_smena); поля остаются редактируемыми
+var SM_LAST=null;
+function smPrefill(){ var el=$('sm-last'); if(el) el.textContent='';
+  jsonp(brigWA,'last_smena','',function(r){ if(!r||!r.ok||!r.date) return; SM_LAST=r; var put=0;
+    var conf= r.conf ? (r.allConfirmed ? ' · подтверждена: '+r.conf.by.split(' ')[0]+' '+String(r.conf.at||'').slice(-5) : ' · подтверждена частично') : ' · ещё не подтверждена';
+    if(dayNum(ddmmyyyy(gv('sm-d')))<=dayNum(r.date)){ if(el) el.textContent='Смена '+r.date+' уже в журнале'+conf; return; }   // правишь старую дату — «нач.» не трогаем
+    [['bul',r.bul],['eks',r.eks],['bag',r.bag]].forEach(function(p){ var m=p[1]; if(!m||!smVisible(p[0])) return;
+      if(!gv(p[0]+'-ms') && m.me){ sv(p[0]+'-ms',m.me); put++; }
+      if(!gv(p[0]+'-fs') && m.fe){ sv(p[0]+'-fs',m.fe); put++; calcF(p[0]); } });
+    if(el) el.textContent=(put?('«Нач.» подставлены с прошлой смены '+r.date+' — поправь, если не так'):('Прошлая смена: '+r.date))+conf; });
+}
+// ---- старший: блоки ребят за день, «исправить / вписать», подтверждение ----
+var SMD=null, SM_EDIT={}, SM_CONF=true, SM_GO_DATE='', SMS=[];
+var SM_ICON={bul:'🚜',eks:'⚙️',bag:'🏍',fuel:'⛽',dop:'📝'}, SM_NAME={bul:'Бульдозер',eks:'Экскаватор',bag:'Багги',fuel:'Прочее топливо',dop:'Дополнительно'};
+function smMine(k){ return myMachines().some(function(m){ return m.sm===k; }); }
+function smDateChanged(){ SM_EDIT={}; smSections(); smPrefill(); smDayLoad(); }
+function smDayLoad(){ var box=$('sm-others'); if(!box) return;
+  if(!hasSmc()){ box.innerHTML=''; SMD=null; return; }
+  var date=gv('sm-d'); box.innerHTML='<div class="hint">Смотрю, что записали за '+ddmmyyyy(date)+'…</div>';
+  jsonp(brigWA,'smena_day','date='+enc(date),function(r){
+    if(!r||!r.ok){ SMD=null; box.innerHTML='<div class="off">Журнал не ответил — блоки ребят не вижу. Свою смену записать можно.</div>'; return; }
+    SMD=r; drawSmOthers(); smFillOwn(); });
+}
+function smWho(b){ return b.who ? b.who.split(' ')[0] : 'записано в таблице'; }
+function smAt(b){ return b.at ? String(b.at).slice(-5) : ''; }
+function smState(b){ if(!b.has) return {cls:'',pill:''}; if(b.confirmed) return {cls:'ok',pill:'<span class="pill ok">✅ подтверждено</span>'}; if(b.changedAfter) return {cls:'warn',pill:'<span class="pill no">⚠ изменено после подтверждения</span>'}; return {cls:'wait',pill:'<span class="pill vi">ждёт подтверждения</span>'}; }
+function drawSmOthers(){ var box=$('sm-others'), r=SMD; if(!box||!r) return;
+  var h='<div class="sec">👥 Что записали за '+r.date+'</div>', n=0;
+  ['bul','eks','bag'].forEach(function(k){ if(smMine(k)) return; var b=r.blocks[k]||{has:false}; n++;
+    var st=smState(b);
+    if(!b.has) h+='<div class="smo"><div class="r1"><div class="ic">'+SM_ICON[k]+'</div><div class="t"><b>'+esc(SM_NAME[k])+'</b><span>не записан</span></div>'
+        +(SM_EDIT[k]?'<span class="pill gr">вписываешь ниже</span>':'<button class="sbtn" onclick="smEdit(\''+k+'\')">вписать за него</button>')+'</div></div>';
+    else h+='<div class="smo '+st.cls+'"><div class="r1"><div class="ic">'+SM_ICON[k]+'</div><div class="t"><b>'+esc(SM_NAME[k])+' — '+esc(smWho(b))+(smAt(b)?', '+smAt(b):'')+'</b><span>'+esc(b.summary||'')+'</span>'+st.pill+'</div>'
+        +(SM_EDIT[k]?'<span class="pill gr">правишь ниже</span>':'<button class="sbtn" onclick="smEdit(\''+k+'\')">исправить</button>')+'</div></div>';
+  });
+  var f=r.blocks.fuel; if(f&&f.has) h+='<div class="smo '+smState(f).cls+'"><div class="r1"><div class="ic">⛽</div><div class="t"><b>Прочее топливо — '+esc(smWho(f))+(smAt(f)?', '+smAt(f):'')+'</b><span>'+esc(f.summary||'')+'</span>'+smState(f).pill+'</div></div></div>';
+  var d=r.blocks.dop; if(d&&d.has) h+='<div class="hint">📝 '+esc(d.summary||'')+(d.who?' — '+esc(smWho(d)):'')+'</div>';
+  if(r.conf) h+='<div class="hint">Подтверждал: '+esc(r.conf.by)+' '+esc(r.conf.at||'')+(r.allConfirmed?' — всё подтверждено':(r.changed.length?' — после этого правили: '+r.changed.map(function(k){return SM_NAME[k].toLowerCase();}).join(', '):''))+'</div>';
+  else if(r.has) h+='<div class="hint">Смена за '+r.date+' ещё не подтверждена. Проверь цифры, допиши своё и нажми «Записать и подтвердить».</div>';
+  if(!n && !r.has) h+='<div class="hint">За эту дату пока ничего не записано.</div>';
+  box.innerHTML=h;
+  var cs=$('sm-conf-s'); if(cs) cs.textContent= r.has ? ('в журнале: '+['bul','eks','bag','fuel'].filter(function(k){return r.blocks[k]&&r.blocks[k].has;}).map(function(k){return SM_NAME[k].toLowerCase();}).join(', ')+(r.allConfirmed?' — уже подтверждено':'')) : 'пока никто ничего не записал — подтвердится то, что запишешь ты';
+}
+// свой блок за эту дату уже записан — показать его цифры, чтобы повторная запись ничего не стёрла
+function smFillOwn(){ if(!SMD) return; ['bul','eks','bag'].forEach(function(k){ if(!smMine(k)) return; var b=SMD.blocks[k]; if(!b||!b.has||!b.vals) return; smPutVals(k,b.vals); }); }
+function smPutVals(k,v){ ['ms','me','fs','fz','fe'].forEach(function(f){ if(v[f]!==undefined&&v[f]!=='') sv(k+'-'+f,v[f]); }); calcF(k);
+  OSM[k]=''; osm(k,''); if(v.osm==='ok'||v.osm==='bad'){ osm(k,v.osm); if(v.osm==='bad') sv(k+'-osm-n',v.osmNote||''); } }
+function smEdit(k){ if(!SMD) return; SM_EDIT[k]=true; var b=SMD.blocks[k]||{};
+  var sec=$('sec-'+k); if(sec) sec.style.display='block';
+  ['ms','me','fs','fz','fe','osm-n'].forEach(function(f){ sv(k+'-'+f,''); }); OSM[k]=''; osm(k,'');
+  var eh=$(k+'-edit'); if(eh){ eh.style.display='block';
+    if(b.has){ smPutVals(k,b.vals||{}); eh.innerHTML='✏️ Правишь блок '+esc(smWho(b))+' — было: <b>'+esc(b.summary||'')+'</b>. Поправь цифры и нажми «Записать».'; }
+    else { eh.innerHTML='✏️ Вписываешь <b>'+esc(SM_NAME[k].toLowerCase())+'</b> за того, кто работал. В журнале останется, что записал ты.';
+      var l=SM_LAST&&SM_LAST[k]; if(l){ if(l.me) sv(k+'-ms',l.me); if(l.fe) sv(k+'-fs',l.fe); calcF(k); } } }
+  drawSmOthers(); setTimeout(function(){ if(sec) sec.scrollIntoView({behavior:'smooth',block:'start'}); },50);
+}
+function smConfToggle(){ SM_CONF=!SM_CONF; var ct=$('sm-conf'); if(ct) ct.classList.toggle('on',SM_CONF); updBar(); }
+function goSm(iso){ SM_GO_DATE=iso||''; GT('sm'); }
+function calcF(m){ var fs=+(gv(m+'-fs'))||0, fz=+(gv(m+'-fz'))||0, fe=+(gv(m+'-fe'))||0;
+  var el=$(m+'-fc'); if(!el)return;
+  el.textContent=fe?'Расход: '+(fs+fz-fe).toFixed(1)+' л':''; }
+var smPhoto='', rmPhoto='', rmfPhoto='', curPick='';
+// осмотр машины в смене: ок / замечания (пишется в колонки осмотра журнала и в лист «Осмотры»)
+var OSM={bul:'',eks:'',bag:''};
+function osm(m,v){ OSM[m]=(OSM[m]===v)?'':v;
+  var ok=$(m+'-osm-ok'), bad=$(m+'-osm-bad'), n=$(m+'-osm-n');
+  if(ok) ok.classList.toggle('on',OSM[m]==='ok'); if(bad) bad.classList.toggle('on',OSM[m]==='bad');
+  if(n){ n.style.display=OSM[m]==='bad'?'block':'none'; if(OSM[m]==='bad') n.focus(); } }
+function osmReset(){ ['bul','eks','bag'].forEach(function(m){ OSM[m]=''; osm(m,''); sv(m+'-osm-n',''); }); }
+function saveSm(btn){
+  var date=gv('sm-d'); if(!date){toast('Укажи дату',true);btn.disabled=false;return;}
+  var confirm_=hasSmc()&&SM_CONF;
+  var d={action:'smena',date:date,ga:'',who:ME.name,confirm:confirm_?1:0,
+    bms:gv('bul-ms'),bme:gv('bul-me'),bfs:gv('bul-fs'),bfz:gv('bul-fz'),bfe:gv('bul-fe'),
+    ems:gv('eks-ms'),eme:gv('eks-me'),efs:gv('eks-fs'),efz:gv('eks-fz'),efe:gv('eks-fe'),
+    gms:gv('bag-ms'),gme:gv('bag-me'),gfs:gv('bag-fs'),gfz:gv('bag-fz'),gfe:gv('bag-fe'),
+    diz:((+gv('bul-fs')+(+gv('bul-fz'))-(+gv('bul-fe')))+((+gv('eks-fs'))+(+gv('eks-fz'))-(+gv('eks-fe')))).toFixed(0),
+    benz:gv('bag-fz'),rash:gv('sm-rash'),note:gv('sm-note'),dizProchee:gv('sm-dp'),benzProchee:gv('sm-bp'),kuda:gv('sm-kuda'),
+    bosm:OSM.bul,bosmNote:gv('bul-osm-n'),eosm:OSM.eks,eosmNote:gv('eks-osm-n'),gosm:OSM.bag,gosmNote:gv('bag-osm-n')};
+  for(var k in OSM) if(OSM[k]==='bad' && !gv({bul:'bul',eks:'eks',bag:'bag'}[k]+'-osm-n').trim()){ toast('Напиши, что не так с машиной',true); btn.disabled=false; return; }
+  // скрытые машины (не открыты этому человеку) не отправляем — их блок пишет другой человек
+  var HID={bul:['bms','bme','bfs','bfz','bfe','bosm','bosmNote'],eks:['ems','eme','efs','efz','efe','eosm','eosmNote'],bag:['gms','gme','gfs','gfz','gfe','gosm','gosmNote']};
+  for(var mk in HID) if(!smVisible(mk)) HID[mk].forEach(function(f){ d[f]=''; });
+  if(!smVisible('bul')&&!smVisible('eks')) d.diz=''; if(!smVisible('bag')) d.benz='';
+  var filled=['bms','bme','bfs','bfz','bfe','ems','eme','efs','efz','efe','gms','gme','gfs','gfz','gfe','rash','note','dizProchee','benzProchee','kuda','bosm','eosm','gosm'].some(function(f){ return String(d[f]||'').trim()!==''; });
+  if(!filled && !confirm_){ toast('Заполни хотя бы одно поле',true); btn.disabled=false; return; }
+  if(!filled && confirm_ && !(SMD&&SMD.has)){ toast('Нечего подтверждать — за '+ddmmyyyy(date)+' никто ничего не записал',true); btn.disabled=false; return; }
+  post(brigWA,d,function(){
+    if(smPhoto) post(brigWA,{action:'smena_photo',date:date,photoBase64:smPhoto},function(){});
+    done_(btn,confirm_?'✓ Смена записана и подтверждена':'✓ Смена записана');
+    SM_EDIT={}; smSections(); ME.homeAt=0; SMS=[];
+    if(hasSmc()) setTimeout(smDayLoad,1500);
+    ['bul-ms','bul-me','bul-fs','bul-fz','bul-fe','eks-ms','eks-me','eks-fs','eks-fz','eks-fe','bag-ms','bag-me','bag-fs','bag-fz','bag-fe','sm-dp','sm-bp','sm-kuda','sm-rash','sm-note'].forEach(clr);
+    ['bul-fc','eks-fc','bag-fc'].forEach(function(id){$(id).textContent='';}); osmReset();
+    smPhoto=''; var pb=$('sm-pb'); pb.classList.remove('done'); pb.textContent='🚁 Фото с коптера / смены'; $('sm-prev').style.display='none';
+  });
+}
+
+// ---- Зарядка ----
+var zMethod='меч', MY_UCH=[];
+function setMethod(m){ zMethod=m; $('zt-mech').classList.toggle('on',m==='меч'); $('zt-nas').classList.toggle('on',m==='насадка'); }
+var zRowCount=0;
+function addZRow(){ var tb=$('z-rows'); var i=++zRowCount;
+  var tr=document.createElement('tr');
+  tr.innerHTML='<td style="text-align:center;color:var(--muted);width:28px">'+i+'</td>'
+    +'<td><input type="time" id="zt'+i+'t"></td>'
+    +'<td><input type="number" id="zt'+i+'c" placeholder="160" inputmode="numeric" oninput="zrCalc()"></td>'
+    +'<td><input type="number" id="zt'+i+'b" placeholder="0" inputmode="numeric" oninput="zrCalc()"></td>';
+  tb.appendChild(tr);
+}
+function buildZRows(){ $('z-rows').innerHTML=''; zRowCount=0; for(var i=0;i<12;i++) addZRow(); zrCalc(); }
+function zrCalc(){ var c=0,b=0,n=0; for(var i=1;i<=zRowCount;i++){ var x=+gv('zt'+i+'c')||0, y=+gv('zt'+i+'b')||0; if(x||y){ c+=x; b+=y; n++; } }
+  $('zr-calc').textContent = n ? ('за день '+nf(c)+' шт · брак '+nf(b)+' · с рук уйдёт '+nf(c+b)) : ''; }
+function loadUchZKS(){
+  var box=$('zr-ucs');
+  if(!ME.name){ box.innerHTML='<div style="color:var(--muted);font-size:14px">сначала войди</div>'; return; }
+  jsonp(zksWA,'uchastki','brigadir='+enc(ME.name),function(r){
+    if(!r||!r.items){ box.innerHTML='<div style="color:#ff9b9b;font-size:14px">⚠ сервер не ответил — нажми ↻</div>'; return; }
+    MY_UCH=r.items; ME.uchastki=r.items; saveMe(); drawUch();
+  });
+}
+function drawUch(){
+  var box=$('zr-ucs'), sel=$('zr-uch');
+  if(!MY_UCH.length){
+    box.innerHTML='<div style="color:#e0a52a;font-size:14px">За тобой пока не закреплён ни один участок.<br>Скажи руководителю — это делается в «Параметрах», колонка K.</div>';
+    sel.innerHTML='<option value=""></option>'; return;
+  }
+  sel.innerHTML='<option value=""></option>'+MY_UCH.map(function(u){ return '<option>'+esc(u.name)+'</option>'; }).join('');
+  box.innerHTML=MY_UCH.map(function(u){
+    var pic=u.img?'<img src="'+esc(u.img)+'" alt="" onerror="this.outerHTML=\'<div class=&quot;noimg&quot;>🗺</div>\'">':'<div class="noimg">🗺</div>';
+    var left=u.leftToPlant||0;
+    var r=left>0?'<div class="r">ещё '+nf(left)+'</div>':'<div class="r done">✓ засажен</div>';
+    return '<div class="uc'+(sel.value===u.name?' on':'')+'" onclick="pickUch(this,\''+q1(u.name)+'\')">'+pic
+      +'<div class="t"><b>'+esc(u.name)+'</b><span>'+(u.ga||0)+' га · план '+nf(u.needSht||0)+' · '+esc(u.way||'')+'</span></div>'+r+'</div>';
+  }).join('');
+}
+function pickUch(el,name){ sv('zr-uch',name); document.querySelectorAll('#zr-ucs .uc').forEach(function(x){x.classList.remove('on');}); el.classList.add('on'); }
+function reloadUch(){ $('zr-ucs').innerHTML='<div style="color:var(--muted);font-size:14px">загрузка…</div>'; loadUchZKS(); }
+function saveZr(btn){
+  var uch=gv('zr-uch'); if(!uch){toast('Выбери участок',true);btn.disabled=false;return;}
+  var date=gv('zr-d'); if(!date){toast('Укажи дату',true);btn.disabled=false;return;}
+  var rows=[];
+  for(var i=1;i<=zRowCount;i++){ var t=gv('zt'+i+'t'),c=gv('zt'+i+'c'),b=gv('zt'+i+'b');
+    if(c) rows.push({time:t,count:Number(c)||0,brak:Number(b)||0}); }
+  if(!rows.length){toast('Заполни хотя бы одну строку',true);btn.disabled=false;return;}
+  post(zksWA,{action:'zaryadka_rows_save',method:zMethod,date:ddmmyyyy(date),uchastok:uch,brigadir:ME.name,rows:rows},function(){
+    done_(btn,'✓ Зарядка сохранена ('+rows.length+' строк)');
+    buildZRows(); ME.homeAt=0;
+  });
+}
+
+// ---- фото ----
+function pick(key){ curPick=key;
+  var useCamera = confirm('Снять камерой?\n\nОК — камера, Отмена — выбрать из галереи');
+  var inp=$('filePick');
+  if(useCamera) inp.setAttribute('capture','environment'); else inp.removeAttribute('capture');
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; inp.value=''; inp.removeAttribute('capture'); if(!f)return;
+    var rd=new FileReader(); rd.onload=function(e){ shrink(e.target.result,1200,function(b64){
+      if(curPick==='sm'){smPhoto=b64; markPb('sm-pb',b64,'sm-prev');}
+      else if(curPick==='rmf'){rmfPhoto=b64; markPb('rmf-pb',b64,'rmf-prev');}
+      else{rmPhoto=b64; markPb('rm-pb',b64,'rm-prev');}
+    });}; rd.readAsDataURL(f);
+  }; inp.click();
+}
+function markPb(bid,b64,pid){ var btn=$(bid),p=$(pid); btn.classList.add('done'); btn.textContent='✓ Фото прикреплено'; p.src=b64; p.style.display='block'; }
+function shrink(u,max,done){ var img=new Image(); img.onload=function(){
+  var w=img.width,h=img.height; if(w>max){h=Math.round(h*max/w);w=max;} if(h>max){w=Math.round(w*max/h);h=max;}
+  var c=document.createElement('canvas');c.width=w;c.height=h;c.getContext('2d').drawImage(img,0,0,w,h);done(c.toDataURL('image/jpeg',0.72));};
+  img.onerror=function(){done(u);}; img.src=u;
+}
+</script>
+<script>
+// ============================================================
+//  САЖЕНЦЫ: заявка · мои партии (бригадир)
+// ============================================================
+var MY_Z=[], szPhotos={};
+function loadSz(){ if(!ME.name) return;
+  jsonp(zksWA,'zayavki','brigadir='+enc(ME.name),function(r){ MY_Z=(r&&r.items)||[]; drawSz(); });
+  jsonp(zksWA,'brigady','',function(r){ var items=(r&&r.items)||[];
+    for(var i=0;i<items.length;i++) if(items[i].name===ME.name){ drawHand(items[i]); return; }
+    drawHand(null); });
+}
+function drawHand(b){
+  var bits=[];
+  if(b){
+    if(b.inBoxes) bits.push('на руках <b>'+nf(b.inBoxes)+' шт</b>');
+    if(b.onRoadSht) bits.push('едет <b>'+nf(b.onRoadSht)+' шт</b>');
+    if(b.openZayavki) bits.push('заявок ждёт ответа: <b>'+b.openZayavki+'</b>');
+    if(b.overdraw) bits.push('<b style="color:#ff9b9b">перерасход '+nf(b.overdraw)+' шт</b>');
+  }
+  var t = bits.length ? bits.join(' · ') : 'Саженцев на руках нет — сделай заявку.';
+  ['sz-hand','sz-hand2'].forEach(function(id){ var el=$(id); if(el) el.innerHTML=t; });
+}
+function drawSz(){
+  var box=$('sz-cards'); if(!box) return;
+  var road=MY_Z.filter(function(z){return z.status==='везу';}).length;
+  setBadge('bd-sz',road,true); setBadge('sb-sz-mine',road);
+  $('sz-mcount').textContent=MY_Z.length?('Партий: '+MY_Z.length):'';
+  if(!MY_Z.length){ box.innerHTML='<div class="empty">Партий пока нет.<br>Сделай заявку — доставщик увидит её сразу.</div>'; return; }
+  box.innerHTML=MY_Z.map(function(z){
+    var pill= z.status==='заявка' ? '<span class="pill vi">ждёт доставщика</span>'
+            : z.status==='везу'   ? '<span class="pill go">🚚 везут — подтверди</span>'
+            : '<span class="pill ok">✓ получено</span>';
+    var body='<div class="mt">заявка № '+esc(z.n)+' · '+esc(z.date)+(z.note?' · 💬 '+esc(z.note):'')+'</div>';
+    if(z.status!=='заявка') body+='<div class="mt">везёт <b style="color:#fff">'+nf(z.shtRec||0)+' шт</b>'
+      +(z.boxRec?' · '+z.boxRec+' ящ × '+z.perBox:'')+(z.supplier?' · '+esc(z.supplier):'')+(z.invoice?' · '+esc(z.invoice):'')+'</div>';
+    if(z.status==='получено') body+='<div class="mt">получено '+esc(z.timeDel||'')+'</div>';
+    var act='';
+    if(z.status==='везу'){
+      var has_=!!szPhotos[z.n];
+      act='<button class="pb'+(has_?' done':'')+'" id="szpb'+z.n+'" onclick="szPick(\''+z.n+'\')">'+(has_?'✓ Фото прикреплено':'📷 Фото ящиков (по желанию)')+'</button>'
+         +'<button class="got" onclick="szConfirm(\''+z.n+'\',this)">✓ Получил '+nf(z.shtRec||0)+' шт</button>';
+    }
+    return '<div class="zk"><div class="r1"><div class="nm">'+nf(z.need)+' шт</div>'+pill+'</div>'+body+act+'</div>';
+  }).join('');
+}
+function saveSz(btn){
+  if(!ME.name){ toast('Сначала войди',true); btn.disabled=false; showLogin(); return; }
+  var need=Number(gv('sz-need'))||0;
+  if(need<=0){ toast('Сколько нужно?',true); btn.disabled=false; return; }
+  post(zksWA,{action:'zayavka_create',brigadir:ME.name,need:need,note:gv('sz-note')},function(){
+    done_(btn,'✓ Заявка на '+nf(need)+' шт отправлена');
+    clr('sz-need'); clr('sz-note'); ME.homeAt=0;
+    if(hasSub('sz','mine')) setTimeout(function(){ setSub('sz','mine'); },900);
+  });
+}
+function szPick(n){ var inp=$('filePick'); inp.setAttribute('capture','environment');
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; inp.value=''; inp.removeAttribute('capture'); if(!f)return;
+    var rd=new FileReader(); rd.onload=function(e){ shrink(e.target.result,1200,function(b64){ szPhotos[n]=b64; drawSz(); }); }; rd.readAsDataURL(f); };
+  inp.click();
+}
+function szConfirm(n,btn){
+  var z=null; for(var i=0;i<MY_Z.length;i++) if(String(MY_Z[i].n)===String(n)) z=MY_Z[i];
+  if(!z) return;
+  if(!confirm('Подтвердить: получил '+nf(z.shtRec||0)+' шт'+(z.boxRec?' ('+z.boxRec+' ящиков)':'')+'?')) return;
+  btn.disabled=true; btn.textContent='Отправляю…';
+  post(zksWA,{action:'dostavka_confirm',n:z.n,row:z.row,brigadir:ME.name,photoBase64:szPhotos[n]||''},function(){
+    toast('✓ Получение подтверждено'); delete szPhotos[n]; ME.homeAt=0;
+    setTimeout(loadSz,1200);
+  });
+}
+
+// ============================================================
+//  САЖЕНЦЫ: заявки на доставку · ответ «везу» (доставщик)
+// ============================================================
+var ZAY=[], SUP=[], PARTII=[], photos={}, files={}, shtManual=false, CUR=null, INV=null;
+function loadSup(){ jsonp(zksWA,'suppliers','',function(r){ SUP=(r&&r.items)||[]; fillSup($('sup'),gv('sup')); }); }
+function fillSup(sel,val){ if(!sel) return;
+  sel.innerHTML='<option value="">— выбери питомник —</option>'+SUP.map(function(s){
+    return '<option'+(s.name===val?' selected':'')+'>'+esc(s.name)+'</option>'; }).join('');
+}
+function sInfo(name){ for(var i=0;i<SUP.length;i++) if(SUP[i].name===name) return SUP[i]; return null; }
+function onSup(){
+  var s=sInfo(gv('sup')), h=$('supHint'); if(!s){ h.textContent=''; return; }
+  var bits=[];
+  if(s.brakPct) bits.push('брак по прошлым партиям '+(s.brakPct*100).toFixed(1).replace('.',',')+' %');
+  if(s.dogovor) bits.push('договор '+s.dogovor);
+  h.textContent=bits.join('  ·  ');
+}
+function markManual(){ shtManual=true; }
+function calcSht(){
+  var b=+gv('nBox')||0, p=+gv('nPer')||0;
+  if(b&&p&&!shtManual) sv('nSht',b*p);
+  var need=CUR?(+CUR.need||0):0, got=+gv('nSht')||0;
+  var t=(b&&p)?(nf(b)+' × '+nf(p)+' = '+nf(b*p)+' шт'):'';
+  if(need&&got){ var d=got-need; t+= (d===0?'  · ровно по заявке':(d>0?'  · на '+nf(d)+' больше заявки':'  · на '+nf(-d)+' МЕНЬШЕ заявки')); }
+  $('nCalc').textContent=t;
+}
+function loadZayavki(){ $('sz-zcount').textContent='Загружаю…';
+  if(!SUP.length) loadSup();
+  if(!PARTII.length) jsonp(zksWA,'partii','limit=40',function(r){ PARTII=(r&&r.items)||[]; });
+  jsonp(zksWA,'zayavki','',function(r){ ZAY=(r&&r.items)||[]; drawZayavki(); });
+}
+function drawZayavki(){
+  var open=ZAY.filter(function(z){return z.status==='заявка';});
+  setBadge('sb-sz-deliver',open.length);
+  if(hasSub('sz','deliver')) setBadge('bd-sz',open.length);
+  $('sz-zcount').textContent=open.length?('Ждут ответа: '+open.length):'';
+  var box=$('sz-zlist');
+  if(!open.length){ box.innerHTML='<div class="empty">Заявок нет.<br>Как только бригадир попросит саженцы — появится здесь.</div>'; return; }
+  box.innerHTML=open.map(function(z){
+    return '<div class="zk open">'
+      + '<div class="who">👷 '+esc(z.brigadir)+'</div>'
+      + '<div class="need">'+nf(z.need)+'<small>шт</small></div>'
+      + '<div class="mt">заявка № '+esc(z.n)+' · '+esc(z.date)+'</div>'
+      + (z.note?'<div class="note">💬 '+esc(z.note)+'</div>':'')
+      + '<button class="go" onclick="openAnswer(\''+z.n+'\')">🚚 Везу — заполнить</button>'
+      + '</div>';
+  }).join('');
+}
+function zById(n){ for(var i=0;i<ZAY.length;i++) if(String(ZAY[i].n)===String(n)) return ZAY[i]; return null; }
+function openAnswer(n){
+  var z=zById(n); if(!z){ toast('Заявка не найдена',true); return; }
+  CUR=z; photos.n=''; files.nd=null; shtManual=false;
+  $('aHead').innerHTML='<div class="who">👷 '+esc(z.brigadir)+'</div>'
+    +'<div class="need">'+nf(z.need)+'<small>шт просит</small></div>'
+    +'<div class="mt">заявка № '+esc(z.n)+' · '+esc(z.date)+'</div>'
+    +(z.note?'<div class="note">💬 '+esc(z.note)+'</div>':'');
+  ['nBox','nSht','nInv'].forEach(clr);
+  var lastPer='', lastSup='';
+  for(var i=0;i<PARTII.length;i++){ if(PARTII[i].perBox){ lastPer=PARTII[i].perBox; lastSup=PARTII[i].supplier; break; } }
+  sv('nPer',lastPer||'');
+  if(!SUP.length) loadSup(); else fillSup($('sup'),lastSup||'');
+  onSup();
+  if(lastPer && z.need) sv('nBox',Math.ceil(z.need/lastPer));
+  $('nCalc').textContent='';
+  var pb=$('nPhotoBtn'); pb.classList.remove('done'); pb.textContent='📷 Фото ящиков в питомнике';
+  var db=$('nDocBtn'); db.classList.remove('done'); db.textContent='📄 Фото или файл накладной';
+  $('nPrev').style.display='none';
+  calcSht();
+  szView('ans'); window.scrollTo(0,0);
+}
+function sendAnswer(btn){
+  if(!CUR){ btn.disabled=false; return; }
+  var box=gv('nBox'), per=gv('nPer'), sht=gv('nSht');
+  if(!sht && !(box&&per)){ toast('Сколько штук везёшь?',true); btn.disabled=false; return; }
+  btn.textContent='Отправляю…';
+  var payload={ action:'dostavka_answer', n:CUR.n, row:CUR.row, supplier:gv('sup'),
+    invoice:gv('nInv'), box:box, perBox:per, sht:sht, photoBase64:photos.n||'', who:ME.name };
+  post(zksWA,payload,function(){
+    var f=files.nd;
+    var fin=function(){
+      done_(btn,'✓ Отправлено: везу '+nf(sht||box*per)+' шт → '+CUR.brigadir);
+      CUR=null; photos.n=''; files.nd=null; PARTII=[]; ME.homeAt=0;
+      setTimeout(function(){ szView('list'); loadZayavki(); },1000);
+    };
+    if(f){ post(zksWA,{action:'dostavka_invoice', n:payload.n, row:payload.row, invoice:gv('nInv'), fileBase64:f.data, mime:f.mime}, fin); }
+    else fin();
+  });
+}
+function pickPhoto(key){ var inp=$('filePick'); inp.setAttribute('capture','environment');
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; inp.value=''; inp.removeAttribute('capture'); if(!f)return;
+    var rd=new FileReader(); rd.onload=function(e){ shrink(e.target.result,1200,function(b64){
+      photos[key]=b64; var b=$('nPhotoBtn'); b.classList.add('done'); b.textContent='✓ Фото прикреплено';
+      var pv=$('nPrev'); pv.src=b64; pv.style.display='block'; }); };
+    rd.readAsDataURL(f); };
+  inp.click();
+}
+function pickFile(key){ var inp=$('docPick');
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; inp.value=''; if(!f)return;
+    var isPdf=/pdf/i.test(f.type)||/\.pdf$/i.test(f.name);
+    var rd=new FileReader();
+    rd.onload=function(e){
+      var fin=function(data){ files[key]={data:data,mime:isPdf?'application/pdf':'image/jpeg',name:f.name};
+        var b=$(key==='nd'?'nDocBtn':'iDocBtn'); b.classList.add('done'); b.textContent='✓ '+(isPdf?'Файл':'Фото')+' накладной прикреплён';
+        if(!isPdf && key==='id'){ var pv=$('iPrev'); pv.src=data; pv.style.display='block'; } };
+      if(isPdf){ if(f.size>6*1024*1024){ toast('PDF больше 6 МБ — сфотографируй',true); return; } fin(e.target.result); }
+      else shrink(e.target.result,1600,fin);
+    };
+    rd.readAsDataURL(f); };
+  inp.click();
+}
+
+// ── все партии + накладная ──
+function loadPartii(){ $('sz-pcount').textContent='Загружаю…';
+  jsonp(zksWA,'partii','limit=80',function(r){ PARTII=(r&&r.items)||[]; drawPartii(); });
+}
+function pById(n){ for(var i=0;i<PARTII.length;i++) if(String(PARTII[i].n)===String(n)) return PARTII[i]; return null; }
+function drawPartii(){
+  $('sz-pcount').textContent=PARTII.length?('Партий: '+PARTII.length):'';
+  var box=$('sz-plist');
+  if(!PARTII.length){ box.innerHTML='<div class="empty">Пока пусто.</div>'; return; }
+  box.innerHTML=PARTII.map(function(p){
+    var rec=+p.shtRec||0, del=+p.shtDel||0, zar=+p.zaryazheno||0, brak=+p.brak||0;
+    var pill = p.status==='заявка' ? '<span class="pill vi">заявка</span>'
+             : p.status==='везу' ? '<span class="pill go">🚚 везу</span>'
+             : (zar+brak>=rec && rec>0) ? '<span class="pill gr">израсходована</span>'
+             : zar>0 ? '<span class="pill ok">в работе</span>'
+             : '<span class="pill ok">получено</span>';
+    var doc = p.invoice ? (p.invoiceUrl?'<a class="lnk" href="'+esc(p.invoiceUrl)+'" target="_blank">📄 '+esc(p.invoice)+'</a>':esc(p.invoice))
+                        : '<span class="pill no">нет УПД</span>';
+    var th='';
+    if(p.url1) th+='<img src="'+esc(p.url1)+'" alt="">';
+    if(p.url2) th+='<img src="'+esc(p.url2)+'" alt="">';
+    if(th) th='<div class="thumbs">'+th+'<span>питомник / у бригадира</span></div>';
+    return '<div class="p'+(p.invoice?'':' nodoc')+'">'
+      + '<div class="r1"><div><div class="nm">№ '+esc(p.n)+' · '+esc(p.date)+'</div>'
+      +   '<div class="uc2">👷 '+esc(p.uchastok)+'</div>'
+      +   '<div class="uc2">'+esc(p.supplier||'питомник не указан')+' · '+doc+'</div></div>'+pill+'</div>'
+      + '<div class="nums">'
+      +   (p.need?'<div><span>просил</span><b>'+nf(p.need)+'</b></div>':'')
+      +   '<div><span>везу</span><b>'+(rec?nf(rec):'—')+'</b></div>'
+      +   '<div><span>получил</span><b>'+(del?nf(del):'—')+'</b></div>'
+      +   (zar?'<div><span>заряжено</span><b>'+nf(zar)+'</b></div>':'')
+      + '</div>' + th
+      + (p.status!=='заявка' ? '<div class="act"><button onclick="openInv(\''+p.n+'\')">📄 '+(p.invoice?'Накладная':'Добавить накладную')+'</button></div>' : '')
+      + '</div>';
+  }).join('');
+}
+function openInv(n){
+  var p=pById(n); if(!p) return;
+  INV=p; files.id=null;
+  $('iTitle').textContent='Накладная к партии № '+p.n;
+  $('iSub').textContent='👷 '+p.uchastok+' · '+p.date+(p.supplier?' · '+p.supplier:'');
+  sv('iInv',p.invoice||'');
+  var b=$('iDocBtn'); b.classList.remove('done'); b.textContent=p.invoiceUrl?'📄 Заменить фото/файл накладной':'📄 Фото или файл (PDF) накладной';
+  var pv=$('iPrev'); if(p.invoiceUrl && !/\/file\/d\//.test(p.invoiceUrl)){ pv.src=p.invoiceUrl; pv.style.display='block'; } else pv.style.display='none';
+  szView('inv'); window.scrollTo(0,0);
+}
+function sendInvoice(btn){
+  if(!INV){ btn.disabled=false; return; }
+  var num=gv('iInv').trim(), f=files.id;
+  if(!num && !f){ toast('Впиши номер или прикрепи документ',true); btn.disabled=false; return; }
+  btn.textContent='Сохраняю…';
+  post(zksWA,{action:'dostavka_invoice', n:INV.n, row:INV.row, invoice:num, fileBase64:f?f.data:'', mime:f?f.mime:''},function(){
+    done_(btn,'✓ Накладная сохранена'); INV=null; files.id=null;
+    setTimeout(function(){ szView('list'); loadPartii(); },1000);
+  });
+}
+
+// ============================================================
+//  ТОПЛИВО — та же схема: заявка → везу → получил.
+//  Сервер: «Журнал основа» (brigWA). Пока он не отвечает —
+//  вкладка показывает заглушку и включится сама.
+// ============================================================
+var FU_ON=false, FU_CHECKED=false, FU=[], FZAY=[], FALL=[], fuType='ДТ', AZS=[];
+// остаток на площадке (одна бочка на всех): замер + получено − залито по журналу − прочее. Считает «Журнал основа».
+var FSTOCK=null, FLOW={'ДТ':300,'АИ-92':40};
+function fuTake(r){ if(r&&r.stock){ FSTOCK=r.stock; if(r.low) FLOW=r.low; drawFuStock(); } }
+function stockStr(f){ var x=FSTOCK&&FSTOCK[f]; if(!x) return ''; return f+' ≈ '+nf(x.calc)+' л'; }
+function drawFuStock(){ var box=$('fu-stock'); if(!box) return;
+  if(!FU_ON||!FSTOCK){ box.innerHTML=''; return; }
+  var dt=FSTOCK['ДТ']||{}, ai=FSTOCK['АИ-92']||{}, low=(dt.calc<(dt.low||FLOW['ДТ'])&&!dt.noMeasure);
+  var bits=[], sub=[];
+  if(dt.noMeasure && ai.noMeasure){ box.innerHTML='<div class="stock low"><div class="t">Остаток на площадке пока не считается — нужен первый замер: сколько сейчас в бочке.<small>получено всего ДТ '+nf(dt.inn||0)+' л · залито '+nf(dt.out||0)+' л</small></div><button class="sbtn on" onclick="fmOpen()">📏 Замер</button></div>'; return; }
+  ['ДТ','АИ-92'].forEach(function(f){ var x=FSTOCK[f]; if(!x) return; if(x.noMeasure){ bits.push(f+': нет замера'); return; } bits.push('<b>'+f+' ≈ '+nf(x.calc)+' л</b>'); });
+  var m=dt.noMeasure?ai:dt; if(m&&!m.noMeasure) sub.push('с замера '+String(m.since||'').slice(0,5)+(m.by?' ('+m.by.split(' ')[0]+')':'')+': получено '+nf(m.inn)+' · залито '+nf(m.out));
+  if(dt.unconfirmed) sub.push('неподтверждённых смен: '+dt.unconfirmed);
+  if(dt.avg7>0&&!dt.noMeasure) sub.push('расход ~'+nf(dt.avg7)+' л/день ДТ');
+  box.innerHTML='<div class="stock'+(low?' low':'')+'"><div class="t">'+(low?'⚠ Дизеля мало: ':'На площадке: ')+bits.join(' · ')+(sub.length?'<small>'+sub.join(' · ')+'</small>':'')+'</div><button class="sbtn" onclick="fmOpen()">📏 Замер</button></div>';
+}
+// карточки Главной по остатку
+function stockCards(){ var out=[]; if(!FU_ON||!FSTOCK) return out;
+  var dt=FSTOCK['ДТ']||{}, ai=FSTOCK['АИ-92']||{};
+  if(dt.noMeasure&&ai.noMeasure){ if(hasSmc()||has('svod')) out.push({kind:'fu',tab:'fu',sub:firstSub('fu'),level:'info',title:'Сделай первый замер топлива',sub_:'сколько сейчас в бочке — с него пойдёт остаток на площадке'}); return out; }
+  ['ДТ','АИ-92'].forEach(function(f){ var x=FSTOCK[f]; if(!x||x.noMeasure) return;
+    if(x.calc<(x.low||FLOW[f])){ var can=hasSub('fu','req'); out.push({kind:'fu',tab:'fu',sub:can?'req':firstSub('fu'),level:'warn',title:(f==='ДТ'?'Дизеля':'Бензина')+' на площадке мало: ≈ '+nf(x.calc)+' л',sub_:can?'подай заявку на топливо':'с замера '+String(x.since||'').slice(0,5)}); } });
+  return out;
+}
+// ---- замер ----
+var fmType='ДТ';
+function fmFuel(t){ fmType=t; $('fm-dt').classList.toggle('on',t==='ДТ'); $('fm-ai').classList.toggle('on',t==='АИ-92'); fmCalc(); }
+function fmOpen(){ var f=$('fu-meas'); if(!f) return; f.style.display='block'; sv('fm-d',todayISO()); sv('fm-fact',''); sv('fm-note',''); fmFuel(fmType); f.scrollIntoView({behavior:'smooth',block:'start'}); }
+function fmClose(){ var f=$('fu-meas'); if(f) f.style.display='none'; }
+function fmCalc(){ var el=$('fm-calc'); if(!el) return; var x=FSTOCK&&FSTOCK[fmType], v=+String(gv('fm-fact')).replace(',','.');
+  if(!x||x.noMeasure){ el.textContent=x?'первый замер '+fmType+' — от него пойдёт отсчёт':''; return; }
+  el.textContent='по расчёту сейчас '+nf(x.calc)+' л'+(gv('fm-fact')!==''?(' · разница '+(v-x.calc>0?'+':'')+nf(Math.round((v-x.calc)*10)/10)+' л'):''); }
+function fmSend(btn){ var v=String(gv('fm-fact')).replace(',','.'); if(v===''||isNaN(+v)||+v<0){ toast('Сколько литров в бочке?',true); return; }
+  btn.disabled=true; btn.textContent='Записываю…';
+  post(brigWA,{action:'fuel_measure',fuel:fmType,fact:+v,date:gv('fm-d'),who:ME.name,note:gv('fm-note')},function(){
+    btn.disabled=false; btn.textContent='✓ Записать замер'; toast('✓ Замер записан: '+fmType+' '+nf(+v)+' л'); fmClose(); ME.homeAt=0;
+    setTimeout(function(){ jsonp(brigWA,'fuel_stock','',function(r){ fuTake(r); if(curTab==='info') loadInfo(); }); },1200); });
+}
+var AZS_DEF=['Роснефть','Газпромнефть','КНП','Лукойл','25 часов'];
+try{ AZS=JSON.parse(localStorage.getItem('geo_azs')||'[]'); }catch(e){ AZS=[]; }
+function azsList(){ var out=[], seen={}; AZS_DEF.concat(AZS).forEach(function(a){ var k=String(a||'').trim(); if(k&&!seen[k.toLowerCase()]){ seen[k.toLowerCase()]=1; out.push(k); } }); return out; }
+function rememberAzs(a){ a=String(a||'').trim(); if(!a) return; if(azsList().map(function(x){return x.toLowerCase();}).indexOf(a.toLowerCase())<0){ AZS.push(a); try{ localStorage.setItem('geo_azs',JSON.stringify(AZS)); }catch(e){} } }
+function fillAzs(id,val){ var sel=$(id); if(!sel) return;
+  sel.innerHTML='<option value="">— выбери АЗС —</option>'+azsList().map(function(a){ return '<option'+(a===val?' selected':'')+'>'+esc(a)+'</option>'; }).join('')+'<option value="__new">＋ другая…</option>'; }
+function azsPick(p){ var sel=$(p==='f'?'fAzs':'lg-azs'), nw=$(p==='f'?'fAzsNew':'lg-azs-new'); if(!sel||!nw) return;
+  nw.style.display=(sel.value==='__new')?'block':'none'; if(sel.value==='__new') nw.focus(); }
+function azsVal(p){ var sel=gv(p==='f'?'fAzs':'lg-azs'); return sel==='__new' ? gv(p==='f'?'fAzsNew':'lg-azs-new').trim() : sel; }
+function fuCheck(done){
+  if(FU_CHECKED){ fuApply(); done(); return; }
+  jsonp(brigWA,'fuel_zayavki','brigadir='+enc(ME.name),function(r){
+    FU_CHECKED=true; FU_ON=!!(r&&r.ok);
+    if(FU_ON){ FU=(r.items||[]); if(r.azs&&r.azs.length) r.azs.forEach(rememberAzs); fuTake(r); }
+    fuApply(); done();
+  });
+}
+function fuApply(){ $('fu-off').style.display=FU_ON?'none':'block'; drawFuStock();
+  SUBDEF.fu.forEach(function(s){ var el=$('fu-'+s[0]); if(el&&!FU_ON) el.style.display='none'; });
+  if(FU_ON) setSubVis('fu');
+  updBar(); }
+function setSubVis(g){ SUBDEF[g].forEach(function(s){ var el=$(g+'-'+s[0]); if(el) el.style.display=(s[0]===SUB[g])?'block':'none'; }); }
+function setFuel(t){ fuType=t; $('ft-dt').classList.toggle('on',t==='ДТ'); $('ft-ai').classList.toggle('on',t==='АИ-92'); }
+function fuHand(){
+  var got={}, road={}, open=0;
+  FU.forEach(function(z){ if(z.status==='получено') got[z.fuel]=(got[z.fuel]||0)+(+z.lit||0); if(z.status==='везу') road[z.fuel]=(road[z.fuel]||0)+(+z.lit||0); if(z.status==='заявка') open++; });
+  var bits=[];
+  ['ДТ','АИ-92'].forEach(function(f){ if(got[f]) bits.push('получено <b>'+nf(got[f])+' л '+f+'</b>'); });
+  ['ДТ','АИ-92'].forEach(function(f){ if(road[f]) bits.push('едет <b>'+nf(road[f])+' л '+f+'</b>'); });
+  if(open) bits.push('заявок ждёт ответа: <b>'+open+'</b>');
+  var t=bits.length?bits.join(' · '):'Заявок на топливо нет — сделай заявку.';
+  ['fu-hand','fu-hand2'].forEach(function(id){ var el=$(id); if(el) el.innerHTML=t; });
+}
+function loadFu(cb){ if(!FU_ON||!ME.name) return;
+  jsonp(brigWA,'fuel_zayavki','brigadir='+enc(ME.name),function(r){ FU=(r&&r.items)||[]; if(r&&r.azs) r.azs.forEach(rememberAzs); fuTake(r); drawFu(); if(cb) cb(); });
+}
+function drawFu(){
+  fuHand();
+  var box=$('fu-cards'); if(!box) return;
+  var road=FU.filter(function(z){return z.status==='везу';}).length;
+  setBadge('bd-fu',road,true); setBadge('sb-fu-mine',road);
+  $('fu-mcount').textContent=FU.length?('Заправок: '+FU.length):'';
+  if(!FU.length){ box.innerHTML='<div class="empty">Заправок пока нет.<br>Сделай заявку — тот, кто возит, увидит её сразу.</div>'; return; }
+  box.innerHTML=FU.map(function(z){
+    var pill= z.status==='заявка' ? '<span class="pill vi">ждёт ответа</span>'
+            : z.status==='везу'   ? '<span class="pill go">🚚 везут — подтверди</span>'
+            : '<span class="pill ok">✓ получено</span>';
+    var body='<div class="mt">заявка № '+esc(z.n)+' · '+esc(z.date)+(z.note?' · 💬 '+esc(z.note):'')+'</div>';
+    if(z.status!=='заявка') body+='<div class="mt">везёт <b style="color:#fff">'+nf(z.lit||0)+' л</b>'+(z.azs?' · '+esc(z.azs):'')+(z.price?' · '+nf(z.price)+' ₽/л':'')+'</div>';
+    if(z.status==='получено') body+='<div class="mt">получено '+esc(z.timeDel||'')+'</div>';
+    var act = z.status==='везу' ? '<button class="got" onclick="fuConfirm(\''+z.n+'\',this)">✓ Получил '+nf(z.lit||0)+' л</button>' : '';
+    return '<div class="zk"><div class="r1"><div class="nm">'+nf(z.need)+' л '+esc(z.fuel||'')+'</div>'+pill+'</div>'+body+act+'</div>';
+  }).join('');
+}
+function saveFu(btn){
+  var need=Number(gv('fu-need'))||0;
+  if(need<=0){ toast('Сколько литров?',true); btn.disabled=false; return; }
+  post(brigWA,{action:'fuel_zayavka_create',brigadir:ME.name,fuel:fuType,need:need,note:gv('fu-note')},function(){
+    done_(btn,'✓ Заявка на '+nf(need)+' л '+fuType+' отправлена'); clr('fu-need'); clr('fu-note'); ME.homeAt=0;
+    if(hasSub('fu','mine')) setTimeout(function(){ setSub('fu','mine'); },900);
+  });
+}
+function fuConfirm(n,btn){
+  var z=null; for(var i=0;i<FU.length;i++) if(String(FU[i].n)===String(n)) z=FU[i];
+  if(!z) return;
+  if(!confirm('Подтвердить: получил '+nf(z.lit||0)+' л '+(z.fuel||'')+'?')) return;
+  btn.disabled=true; btn.textContent='Отправляю…';
+  post(brigWA,{action:'fuel_confirm',n:z.n,row:z.row,brigadir:ME.name},function(){ toast('✓ Получение подтверждено — топливо на площадке'); ME.homeAt=0; setTimeout(loadFu,1200); });
+}
+// — доставщик —
+var FCUR=null;
+function loadFuZayavki(cb){ if(!FU_ON) return; $('fu-zcount').textContent='Загружаю…';
+  jsonp(brigWA,'fuel_zayavki','all=1',function(r){ FZAY=(r&&r.items)||[]; if(r&&r.azs) r.azs.forEach(rememberAzs); fuTake(r); drawFuZayavki(); if(cb) cb(); });
+}
+function drawFuZayavki(){
+  var open=FZAY.filter(function(z){return z.status==='заявка';});
+  setBadge('sb-fu-deliver',open.length); if(hasSub('fu','deliver')) setBadge('bd-fu',open.length);
+  $('fu-zcount').textContent=open.length?('Ждут ответа: '+open.length):'';
+  var box=$('fu-zlist');
+  if(!open.length){ box.innerHTML='<div class="empty">Заявок нет.<br>Как только бригадир попросит топливо — появится здесь.</div>'; return; }
+  box.innerHTML=open.map(function(z){
+    return '<div class="zk open"><div class="who">👷 '+esc(z.brigadir)+'</div>'
+      +'<div class="need">'+nf(z.need)+'<small>л '+esc(z.fuel||'')+'</small></div>'
+      +'<div class="mt">заявка № '+esc(z.n)+' · '+esc(z.date)+'</div>'
+      +(z.note?'<div class="note">💬 '+esc(z.note)+'</div>':'')
+      +'<button class="go" onclick="openFuAnswer(\''+z.n+'\')">⛽ Везу — заполнить</button></div>';
+  }).join('');
+}
+function openFuAnswer(n){
+  var z=null; for(var i=0;i<FZAY.length;i++) if(String(FZAY[i].n)===String(n)) z=FZAY[i];
+  if(!z){ toast('Заявка не найдена',true); return; }
+  FCUR=z;
+  $('fHead').innerHTML='<div class="who">👷 '+esc(z.brigadir)+'</div><div class="need">'+nf(z.need)+'<small>л '+esc(z.fuel||'')+' просит</small></div>'
+    +'<div class="mt">заявка № '+esc(z.n)+' · '+esc(z.date)+'</div>'+(z.note?'<div class="note">💬 '+esc(z.note)+'</div>':'');
+  sv('fLit',z.need||''); sv('fPrice',''); fillAzs('fAzs',''); $('fAzsNew').style.display='none'; sv('fAzsNew','');
+  calcFu(); fuView('ans'); window.scrollTo(0,0);
+}
+function calcFu(){ var l=+String(gv('fLit')).replace(',','.')||0, p=+String(gv('fPrice')).replace(',','.')||0, need=FCUR?(+FCUR.need||0):0;
+  var t=''; if(l&&p) t=nf(l)+' × '+nf(p)+' = '+nf(Math.round(l*p))+' ₽';
+  if(l&&need){ var d=l-need; t+=(t?' · ':'')+(d===0?'ровно по заявке':d>0?'на '+nf(d)+' л больше заявки':'на '+nf(-d)+' л МЕНЬШЕ заявки'); }
+  $('fCalc').textContent=t; }
+function sendFuAnswer(btn){
+  if(!FCUR){ btn.disabled=false; return; }
+  var lit=+String(gv('fLit')).replace(',','.')||0; if(!lit){ toast('Сколько литров везёшь?',true); btn.disabled=false; return; }
+  var azs=azsVal('f'); if(!azs){ toast('С какой заправки?',true); btn.disabled=false; return; }
+  var price=String(gv('fPrice')).replace(',','.');
+  btn.textContent='Отправляю…';
+  post(brigWA,{action:'fuel_answer',n:FCUR.n,row:FCUR.row,lit:lit,azs:azs,price:price,who:ME.name},function(){
+    rememberAzs(azs); done_(btn,'✓ Везу '+nf(lit)+' л → '+FCUR.brigadir); FCUR=null; ME.homeAt=0;
+    setTimeout(function(){ fuView('list'); loadFuZayavki(); },1000);
+  });
+}
+function loadFuAll(){ if(!FU_ON) return; $('fu-acount').textContent='Загружаю…';
+  jsonp(brigWA,'fuel_zayavki','all=1',function(r){ FALL=(r&&r.items)||[]; fuTake(r); drawFuAll(); });
+}
+function drawFuAll(){
+  var box=$('fu-alist'); $('fu-acount').textContent=FALL.length?('Заправок: '+FALL.length):'';
+  if(!FALL.length){ box.innerHTML='<div class="empty">Пока пусто.</div>'; return; }
+  var tot={}; FALL.forEach(function(z){ if(z.status==='получено'){ var f=z.fuel||'?'; tot[f]=tot[f]||{l:0,r:0}; tot[f].l+=(+z.lit||0); tot[f].r+=(+z.lit||0)*(+z.price||0); } });
+  var head=Object.keys(tot).map(function(f){ return f+': <b>'+nf(tot[f].l)+' л</b>'+(tot[f].r?' · '+nf(Math.round(tot[f].r))+' ₽':''); }).join(' · ');
+  box.innerHTML=(head?'<div class="hand">получено всего · '+head+'</div>':'')+FALL.map(function(z){
+    var pill= z.status==='заявка'?'<span class="pill vi">заявка</span>':z.status==='везу'?'<span class="pill go">🚚 везу</span>':'<span class="pill ok">получено</span>';
+    return '<div class="p"><div class="r1"><div><div class="nm">№ '+esc(z.n)+' · '+esc(z.date)+'</div><div class="uc2">👷 '+esc(z.brigadir)+' · '+esc(z.fuel||'')+(z.azs?' · '+esc(z.azs):'')+'</div></div>'+pill+'</div>'
+      +'<div class="nums"><div><span>просил</span><b>'+nf(z.need)+'</b></div><div><span>везу</span><b>'+(z.lit?nf(z.lit):'—')+'</b></div>'+(z.price?'<div><span>₽/л</span><b>'+nf(z.price)+'</b></div><div><span>сумма</span><b>'+nf(Math.round(+z.sum||((+z.lit||0)*(+z.price||0))))+'</b></div>':'')+(z.who?'<div><span>вёз</span><b style="font-size:12px">'+esc(z.who.split(' ')[0])+'</b></div>':'')+'</div></div>';
+  }).join('');
+}
+</script>
+<script>
+// ============================================================
+//  ЗАКУПКИ — узлы, ссылка, каталог, заказ (бригадир)
+// ============================================================
+var CAT=[], ORD=[];
+var TECHS=['Саженцы','Komatsu D65','XCMG XE180DN','Traxter XMR','Посадочная SCB160','Ford F-350','Toyota Prado','Toyota Caldina','VW Caravelle','Прицеп','Генератор 4кВт','Топливо дизель','Топливо бензин','Быт/Общее'];
+var NODE_COMMON=['Фильтры / расходники','Крепёж','Прочее'];
+var NODE_MAP={
+ 'Саженцы':['Посадочный материал','Удобрения / химия','Тара / упаковка','Прочее'],
+ 'Komatsu D65':['Двигатель','Трансмиссия / ГМП','Ходовая (гусеницы, катки)','Гидравлика','Отвал / рыхлитель','Система охлаждения','Топливная система','Электрика','Кабина / салон'],
+ 'XCMG XE180DN':['Двигатель','Гидравлика (насос, распределитель)','Ходовая (гусеницы)','Поворотная платформа','Стрела / рукоять / ковш','Система охлаждения','Топливная система','Электрика','Кабина / салон'],
+ 'Traxter XMR':['Двигатель','Вариатор CVT','Трансмиссия / редукторы','Подвеска','Тормоза','Колёса / шины','Электрика','Кузов / пластик'],
+ 'Посадочная SCB160':['Рама','Гидравлика','Сошник / высаживающий аппарат','Привод','Колёса'],
+ 'Ford F-350':['Двигатель','КПП / трансмиссия','Подвеска','Тормоза','Рулевое','Электрика','Кузов / оптика','Салон','Колёса / шины','Система охлаждения','Топливная система','Выхлоп'],
+ 'Toyota Prado':['Двигатель','КПП / трансмиссия','Подвеска','Тормоза','Рулевое','Электрика','Кузов / оптика','Салон','Колёса / шины','Система охлаждения','Топливная система','Выхлоп'],
+ 'Toyota Caldina':['Двигатель','КПП / трансмиссия','Подвеска','Тормоза','Рулевое','Электрика','Кузов / оптика','Салон','Колёса / шины','Система охлаждения','Топливная система','Выхлоп'],
+ 'VW Caravelle':['Двигатель','КПП / трансмиссия','Подвеска','Тормоза','Рулевое','Электрика','Кузов / оптика','Салон','Колёса / шины','Система охлаждения','Топливная система','Выхлоп'],
+ 'Прицеп':['Ходовая / оси','Тормоза','Электрика / освещение','Кузов / борта','Сцепное','Колёса / шины'],
+ 'Генератор 4кВт':['Двигатель','Генератор / альтернатор','Электрика / панель','Топливная система'],
+ 'Топливо дизель':['Топливо'],'Топливо бензин':['Топливо'],
+ 'Быт/Общее':['Инструмент','Спецодежда / СИЗ','Хозтовары','Канцелярия','Питание / быт','Стройматериалы']
+};
+function nodesFor(tech){ var out=(NODE_MAP[tech]||[]).slice(); NODE_COMMON.forEach(function(n){ if(out.indexOf(n)<0) out.push(n); }); return out; }
+function fillNodes(techId,nodeId,selected){
+  var sel=$(nodeId); if(!sel) return;
+  var list=nodesFor(gv(techId));
+  if(selected && list.indexOf(selected)<0) list=list.concat([selected]);
+  sel.innerHTML='<option value="">— не указан —</option>'+list.map(function(n){ return '<option'+(n===selected?' selected':'')+'>'+esc(n)+'</option>'; }).join('');
+}
+function loadNodes(){ jsonp(zakWA,'nodes','',function(r){ if(r&&r.ok&&r.map){ NODE_MAP=r.map; if(r.common) NODE_COMMON=r.common; } fillNodes('zk-tech','zk-node'); }); }
+function setTechSel(id,tech){ var ts=$(id); if(!ts||!tech) return;
+  for(var i=0;i<ts.options.length;i++) if(ts.options[i].value===tech||ts.options[i].text===tech){ ts.selectedIndex=i; return; }
+  var op=document.createElement('option'); op.text=tech; ts.add(op); ts.value=tech; }
+
+// сумма в форме заказа
+function zkSum(){ var q=parseFloat(String(gv('zk-qty')).replace(',','.'))||0, p=parseFloat(String(gv('zk-price')).replace(',','.'))||0;
+  var out=$('zk-sum'), cal=$('zk-sum-calc');
+  if(q>0&&p>0){ out.textContent=nf(Math.round(q*p*100)/100)+' ₽'; out.className='val'; cal.textContent=nf(q)+' × '+nf(p)+' ₽'; }
+  else { out.textContent='—'; out.className='val zero'; cal.textContent=(q>0&&!p)?'впиши цену':(p>0&&!q)?'впиши количество':''; } }
+function calcSum(p){
+  var qEl=$(p+'-qty'), pEl=$(p+'-price'), box=$(p+'-sum-box'), out=$(p+'-sum'), cal=$(p+'-sum-calc');
+  if(!out) return;
+  var hidden = qEl && qEl.parentNode && qEl.parentNode.style.display==='none';
+  if(box) box.style.display = hidden ? 'none' : 'flex';
+  var q=parseFloat(String(qEl?qEl.value:'').replace(',','.'))||0, pr=parseFloat(String(pEl?pEl.value:'').replace(',','.'))||0;
+  if(q>0 && pr>0){ out.textContent=nf(Math.round(q*pr*100)/100)+' ₽'; out.className='val'; if(cal) cal.textContent=nf(q)+' × '+nf(pr)+' ₽'; }
+  else { out.textContent='—'; out.className='val zero'; if(cal) cal.textContent=(q>0&&!pr)?'впиши цену':(pr>0&&!q)?'впиши количество':''; }
+}
+
+// автоподтяжка по ссылке
+var linkTimer=null, lastPulled='';
+function linkTyped(){ clearTimeout(linkTimer); var u=gv('zk-link').trim();
+  if(!/^https?:\/\//i.test(u) && !/^www\./i.test(u)){ lstat(''); return; }
+  linkTimer=setTimeout(function(){ pullLink(0); }, 700); }
+function lstat(t,cls){ var el=$('zk-lstat'); if(!el) return; el.textContent=t||''; el.style.color = cls==='ok' ? '#8fe08a' : cls==='err' ? '#ff9b9b' : 'var(--muted)'; }
+function pullLink(force){
+  var u=gv('zk-link').trim();
+  if(!u){ lstat('Сначала вставь ссылку','err'); return; }
+  if(!force && u===lastPulled) return;
+  lastPulled=u;
+  var btn=$('zk-pull'); if(btn) btn.disabled=true;
+  lstat('Читаю страницу товара…');
+  jsonp(zakWA,'meta','url='+enc(u),function(r){
+    if(btn) btn.disabled=false;
+    if(!r||!r.ok){ lstat('Не получилось прочитать — впиши название и цену руками','err'); return; }
+    var got=[];
+    if(r.name && (force || !gv('zk-nm').trim())){ sv('zk-nm',r.name); got.push('название'); }
+    if(r.price && (force || !gv('zk-price'))){ sv('zk-price',r.price); got.push('цена'); }
+    var pv=$('zk-prev'); if(r.photo){ pv.src=r.photo; pv.style.display='block'; got.push('фото'); }
+    if(!gv('zk-unit')) sv('zk-unit','шт'); if(!gv('zk-qty')) sv('zk-qty','1');
+    zkSum();
+    if(got.length) lstat('✓ Подтянул: '+got.join(', ')+' · '+(r.source||'')+'. Количество поставь сам','ok');
+    else lstat('Ничего нового не нашлось на этой странице','err');
+  });
+}
+function pullInto(p){
+  var u=gv(p+'-link').trim(), ls=$(p+'-lstat'), btn=$(p+'-pull');
+  if(!u){ ls.textContent='Сначала вставь ссылку'; ls.style.color='#ff9b9b'; return; }
+  btn.disabled=true; ls.style.color='var(--muted)'; ls.textContent='Читаю страницу товара…';
+  jsonp(zakWA,'meta','url='+enc(u),function(r){
+    btn.disabled=false;
+    if(!r||!r.ok){ ls.textContent='Не получилось прочитать — впиши руками'; ls.style.color='#ff9b9b'; return; }
+    var got=[];
+    if(r.name){ sv(p+'-name',r.name); got.push('название'); }
+    if(r.price){ sv(p+'-price',r.price); got.push('цена'); }
+    calcSum(p);
+    var pv=$(p+'-prev'); if(r.photo && pv){ pv.src=r.photo; pv.style.display='block'; got.push('фото'); }
+    var un=$(p+'-unit'); if(un && !un.value) un.value='шт';
+    ls.style.color=got.length?'#8fe08a':'#ff9b9b';
+    ls.textContent=got.length?('✓ Подтянул: '+got.join(', ')+' · '+(r.source||'')):'Ничего не нашлось на этой странице';
+  });
+}
+
+// каталог: поиск в поле
+function loadCat(){ var c=$('zc-cnt'); if(c) c.textContent='Загружаю…';
+  jsonp(zakWA,'catalog','',function(r){ CAT=(r&&r.items)||[]; if(curTab==='zk'&&SUB.zk==='cat') drawCat(); if(curTab==='zk'&&SUB.zk==='search') drawZs(); }); }
+function srch(){ var q=(gv('zk-nm')||'').toLowerCase().trim(), dd=$('zk-dd');
+  if(!q||CAT.length===0){dd.style.display='none';return;}
+  var f=CAT.filter(function(x){return x.name.toLowerCase().indexOf(q)>=0;}).slice(0,8);
+  if(!f.length){dd.style.display='none';return;}
+  dd.innerHTML=f.map(function(x){return '<div class="dd-row" style="display:flex;align-items:center;gap:9px" onclick="fillCat(\''+q1(x.name)+'\')">'
+    +(x.photo?'<img src="'+esc(x.photo)+'" style="width:34px;height:34px;object-fit:cover;border-radius:5px;flex-shrink:0" onerror="this.style.display=\'none\'">':'')
+    +'<span style="flex:1">'+esc(x.name)+'</span>'+(x.tech?'<span style="color:var(--muted);font-size:12px">'+esc(x.tech)+'</span>':'')+'</div>';}).join('');
+  dd.style.display='block';
+}
+function fillCat(nm){ var it=CAT.find(function(x){return x.name===nm;}); if(!it)return;
+  sv('zk-nm',nm);
+  if(it.unit) sv('zk-unit',it.unit);
+  if(it.tech) setTechSel('zk-tech',it.tech);
+  fillNodes('zk-tech','zk-node',it.node||'');
+  if(it.link){ sv('zk-link',it.link); lastPulled=it.link; lstat('Ссылка из каталога'); }
+  if(it.price) sv('zk-price',it.price);
+  var pv=$('zk-prev'); if(it.photo){ pv.src=it.photo; pv.style.display='block'; } else { pv.style.display='none'; }
+  $('zk-dd').style.display='none'; zkSum();
+}
+document.addEventListener('click',function(e){ if(!e.target.closest('.srch')){ var dd=$('zk-dd'); if(dd) dd.style.display='none'; } });
+
+// поиск: терпит раскладку
+var LAT="qwertyuiop[]asdfghjkl;'zxcvbnm,.";
+var CYR="йцукенгшщзхъфывапролджэячсмитьбю";
+function fixLayout(s){ var o=''; for(var i=0;i<s.length;i++){ var p=LAT.indexOf(s.charAt(i)); o+=(p>=0?CYR.charAt(p):s.charAt(i)); } return o; }
+function norm(s){ return String(s==null?'':s).toLowerCase().replace(/ё/g,'е').replace(/[^0-9a-zа-я]+/g,' ').replace(/\s+/g,' ').trim(); }
+function dom(u){ return String(u||'').replace(/^https?:\/\//,'').split('/')[0]; }
+function hay(o){ return norm([o.id,o.name,o.tech,o.node,o.status,(o.accepted==='✓'?'принято':''),o.comment,o.unit,o.qty,o.price,o.date,dom(o.link)].join(' ')); }
+function hayCat(x){ return norm([x.name,x.tech,x.node,x.unit,x.price,x.supplier,x.lastDate,dom(x.link)].join(' ')); }
+function hit_(h,q,id){
+  if(!q||!norm(q)) return true;
+  var ex=String(q).match(/^\s*[№#]\s*(\d+)\s*$/);
+  if(ex) return String(id||'')===ex[1];
+  var t1=norm(q).split(' ').filter(Boolean);
+  if(t1.length && t1.every(function(t){return h.indexOf(t)>=0;})) return true;
+  var t2=norm(fixLayout(String(q).toLowerCase())).split(' ').filter(Boolean);
+  return !!(t2.length && t2.every(function(t){return h.indexOf(t)>=0;}));
+}
+function matches(o,q){ return hit_(hay(o),q,o.id); }
+function matchesCat(x,q){ return hit_(hayCat(x),q); }
+function hl(text,q){
+  var s=esc(text); var toks=norm(q||'').split(' ').filter(function(t){return t.length>1;});
+  toks.forEach(function(t){ try{ s=s.replace(new RegExp('('+t.replace(/[.*+?^${}()|[\]\\]/g,'\\$&')+')','gi'),'<mark style="background:#b5852a55;color:inherit;border-radius:3px">$1</mark>'); }catch(e){} });
+  return s;
+}
+
+// каталог — карточки
+var zcTech='';
+function setZcTech(t){ zcTech=t; drawCat(); }
+function drawCat(){
+  var q=gv('zc-q'), box=$('zc-list');
+  if(!CAT.length){ box.innerHTML='<div class="empty">Каталог пуст или ещё грузится…</div>'; $('zc-cnt').textContent=''; return; }
+  var t={}; CAT.forEach(function(x){ var k=(x.tech||'').trim(); if(k) t[k]=(t[k]||0)+1; });
+  var ch='<div class="chip'+(zcTech===''?' on':'')+'" onclick="setZcTech(\'\')">Всё ('+CAT.length+')</div>';
+  Object.keys(t).sort().forEach(function(k){ ch+='<div class="chip'+(zcTech===k?' on':'')+'" onclick="setZcTech(\''+q1(k)+'\')">'+esc(k)+' ('+t[k]+')</div>'; });
+  $('zc-chips').innerHTML=ch;
+  var list=CAT.filter(function(x){ return (!zcTech||(x.tech||'')===zcTech) && matchesCat(x,q); });
+  $('zc-cnt').textContent='Показано: '+list.length+' из '+CAT.length;
+  if(!list.length){ box.innerHTML='<div class="empty">Ничего не нашлось.<br>Такого товара ещё не покупали — заведи через «Заказать».</div>'; return; }
+  var canOrder=hasSub('zk','order'), canEdit=hasSub('zk','req');
+  box.innerHTML=list.slice(0,120).map(function(x){
+    var meta=[x.tech,x.node,x.unit].filter(Boolean).join(' · ');
+    var h='<div class="card"><div style="display:flex;gap:10px">';
+    if(x.photo) h+='<img src="'+esc(x.photo)+'" loading="lazy" style="width:56px;height:56px;object-fit:cover;border-radius:8px;flex-shrink:0" onerror="this.style.display=\'none\'">';
+    h+='<div style="flex:1;min-width:0"><div class="nm">'+hl(x.name,q)+'</div>';
+    if(meta) h+='<div class="meta">'+hl(meta,q)+'</div>';
+    if(x.price) h+='<div class="meta price">'+nf(x.price)+' ₽'+(x.unit?(' / '+esc(x.unit)):'')+'</div>';
+    h+='</div></div><div class="acts">';
+    if(canOrder) h+='<button style="background:var(--acc)" onclick="orderFromCat(\''+q1(x.name)+'\')">🛒 Заказать</button>';
+    if(x.link) h+='<button class="b-edit" onclick="window.open(\''+esc(x.link)+'\',\'_blank\')">🔗 Открыть</button>';
+    if(canEdit) h+='<button class="b-edit" onclick="openEdit(\''+q1(x.name)+'\')">✏ Изменить</button>';
+    return h+'</div></div>';
+  }).join('');
+}
+var zkForce=0;
+function fillOrderForm(d){
+  sv('zk-nm',d.name||''); sv('zk-qty',(d.qty!=null&&d.qty!==''?d.qty:1)); sv('zk-unit',d.unit||'шт'); sv('zk-price',(d.price!=null?d.price:''));
+  if(d.tech) setTechSel('zk-tech',d.tech);
+  fillNodes('zk-tech','zk-node',d.node||'');
+  sv('zk-link',d.link||''); lastPulled=d.link||''; sv('zk-comm','');
+  var pv=$('zk-prev'); if(d.photo){ pv.src=d.photo; pv.style.display='block'; } else pv.style.display='none';
+  lstat(d.was?('В прошлый раз брали '+d.was+' '+(d.wasUnit||'')+' — поправь количество и отправляй'):'Всё подставлено из каталога — проверь количество','ok');
+  zkForce=1; zkSum();
+  SUB.zk='order'; if(curTab!=='zk') GT('zk'); else setSub('zk','order');
+  $('zk-dd').style.display='none';
+  window.scrollTo({top:0,behavior:'smooth'});
+  var qf=$('zk-qty'); setTimeout(function(){ qf.focus(); qf.select(); },250);
+}
+function catItem(name){ var k=String(name||'').toLowerCase().trim(); for(var i=0;i<CAT.length;i++) if(String(CAT[i].name).toLowerCase().trim()===k) return CAT[i]; return null; }
+function lastOrdOf(name){ var k=String(name||'').toLowerCase().trim(), best=null;
+  for(var i=0;i<ORD.length;i++){ if(String(ORD[i].name).toLowerCase().trim()===k){ if(!best||Number(ORD[i].id)>Number(best.id)) best=ORD[i]; } } return best; }
+function orderFromCat(name){
+  var c=catItem(name); if(!c) return; var last=lastOrdOf(name);
+  fillOrderForm({name:c.name,qty:(last?last.qty:1),unit:c.unit||(last&&last.unit),price:c.price||(last&&last.price),
+    tech:c.tech||(last&&last.tech),node:c.node||(last&&last.node),link:c.link,photo:c.photo, was:(last?last.qty:''),wasUnit:(last?last.unit:'')});
+}
+function orderAgain(id){
+  var o=null; for(var i=0;i<ORD.length;i++) if(String(ORD[i].id)===String(id)) o=ORD[i];
+  if(!o) return; var c=catItem(o.name)||{};
+  fillOrderForm({name:o.name,qty:o.qty,unit:o.unit||c.unit,price:o.price||c.price,tech:o.tech||c.tech, node:o.node||c.node,link:o.link||c.link,photo:o.photo||c.photo,was:o.qty,wasUnit:o.unit});
+}
+function saveZk(btn){
+  var nm=gv('zk-nm').trim(); if(!nm){toast('Укажи наименование',true);btn.disabled=false;return;}
+  var pv=$('zk-prev'); var photo=(pv&&pv.style.display!=='none')?pv.src:'';
+  var q=parseFloat(String(gv('zk-qty')).replace(',','.'))||0, p=parseFloat(String(gv('zk-price')).replace(',','.'))||0;
+  post(zakWA,{action:'zakupka_save',force:zkForce,name:nm,qty:gv('zk-qty'),unit:gv('zk-unit'),price:gv('zk-price'),summa:(q*p)||'',
+              tech:gv('zk-tech'),node:gv('zk-node'),link:gv('zk-link'),photo:photo,comment:gv('zk-comm'),who:ME.name},function(){
+    done_(btn,'✓ Заявка отправлена');
+    ['zk-nm','zk-qty','zk-unit','zk-price','zk-link','zk-comm'].forEach(clr);
+    $('zk-prev').style.display='none'; lastPulled=''; lstat(''); zkForce=0; zkSum();
+    fillNodes('zk-tech','zk-node'); ME.homeAt=0;
+    setTimeout(loadOrders,1300);
+  });
+}
+
+// ---- заказы: общий список для всех подвкладок ----
+function loadOrders(){ var c=$('zk-ocount'); if(c) c.textContent='Загружаю…';
+  jsonp(zakWA,'zakupki','',function(r){ ORD=(r&&r.items)||[]; updZkBadge(); redrawZk(); });
+}
+function redrawZk(){
+  if(curTab==='info' && INFO_ME!==undefined){ try{ drawInfo(INFO_ME,INFO_UCH); }catch(e){} }
+  if(curTab!=='zk') return;
+  if(SUB.zk==='mine') drawOrders(); if(SUB.zk==='req') drawZq(); if(SUB.zk==='ordered') drawZo(); if(SUB.zk==='search') drawZs(); }
+var ST_ORDER={'Склад Участок':1,'Заказал':2,'Надо купить':3,'Склад Брянская':5,'Склад Гараж':6,'Израсходовано':7,'Отменён':8};
+function waitingReceive(o){ return o.status==='Склад Участок' && o.accepted!=='✓'; }
+function sortOrders(list){ return list.slice().sort(function(a,b){
+  var wa=waitingReceive(a)?0:(ST_ORDER[a.status]!=null?ST_ORDER[a.status]:9);
+  var wb=waitingReceive(b)?0:(ST_ORDER[b.status]!=null?ST_ORDER[b.status]:9);
+  if(a.status==='Склад Участок'&&a.accepted==='✓') wa=4;
+  if(b.status==='Склад Участок'&&b.accepted==='✓') wb=4;
+  if(wa!==wb) return wa-wb;
+  return (Number(b.id)||0)-(Number(a.id)||0);
+}); }
+function updZkBadge(){
+  var n=ORD.filter(waitingReceive).length, need=ORD.filter(function(o){return o.status==='Надо купить';}).length, ord=ORD.filter(function(o){return o.status==='Заказал';}).length;
+  var tot=(hasSub('zk','mine')?n:0)+(hasSub('zk','req')?need:0);
+  setBadge('bd-zk',tot); setBadge('sb-zk-mine',n); setBadge('sb-zk-req',need); setBadge('sb-zk-ordered',ord);
+  var al=$('zk-alert');
+  if(n){ al.style.display='block'; al.innerHTML='🔔 '+n+' '+(n===1?'товар приехал':(n<5?'товара приехали':'товаров приехали'))+' на участок — примите (нажмите тут)'; }
+  else al.style.display='none';
+}
+function focusReceive(){ var first=document.querySelector('#zk-olist .need-receive'); if(first) first.scrollIntoView({behavior:'smooth',block:'center'}); }
+function pillZ(st){ var c={'Надо купить':'#B71C1C','Заказал':'#E65100','Склад Участок':'#1B5E20','Склад Брянская':'#4527A0','Склад Гараж':'#4E342E','Принято':'#00695C','Израсходовано':'#616161','Отменён':'#607D8B'}[st]||'#555';
+  return '<span style="font-size:12px;font-weight:700;padding:3px 9px;border-radius:20px;background:'+c+'33;color:#fff;border:1px solid '+c+';white-space:nowrap">'+esc(st)+'</span>'; }
+var zkFilter='';
+function setF(v){ zkFilter=v; drawOrders(); }
+function clearQ(){ sv('zk-q',''); zkFilter=''; drawOrders(); }
+function chipH(label,val,n){ var on=(zkFilter===val);
+  return '<div class="chip'+(on?' on':'')+'" onclick="setF(\''+q1(val)+'\')">'+esc(label)+' ('+n+')</div>'; }
+function stOf(o){ return (o.accepted==='✓'&&String(o.status).indexOf('Склад')===0)?'Принято':o.status; }
+function sumOf(o){ var s=(Number(o.qty)||0)*(Number(o.price)||0); return s>0?Math.round(s*100)/100:0; }
+
+// мои заказы (бригадир)
+function drawOrders(){
+  var box=$('zk-olist'), q=gv('zk-q');
+  var cnt={}; ORD.forEach(function(o){ var s=stOf(o); cnt[s]=(cnt[s]||0)+1; });
+  var ch=chipH('Все','',ORD.length); Object.keys(cnt).forEach(function(s){ ch+=chipH(s,s,cnt[s]); });
+  $('zk-fchips').innerHTML=ch;
+  var list=ORD.filter(function(o){ return (!zkFilter||stOf(o)===zkFilter) && matches(o,q); });
+  $('zk-ocount').textContent = ORD.length ? ('Показано: '+list.length+' из '+ORD.length) : '';
+  if(!ORD.length){ box.innerHTML='<div class="empty">Пока пусто.<br>Отправь первую заявку.</div>'; return; }
+  if(!list.length){ box.innerHTML='<div class="empty">Ничего не нашлось.<br>Попробуй другое слово или сбрось фильтр.</div>'; return; }
+  var canOrder=hasSub('zk','order');
+  box.innerHTML=sortOrders(list).map(function(o){ var st=o.status, acc=(o.accepted==='✓'), wait=waitingReceive(o), s=sumOf(o);
+    var meta=[o.qty?(o.qty+' '+(o.unit||'')):'', o.tech, o.node, o.date].filter(Boolean).join(' · ');
+    var h='<div class="card'+(wait?' need-receive':'')+'" style="'+(wait?'border-color:#b5852a;box-shadow:0 0 0 1px #b5852a':'')+'">'
+      +'<div class="top"><div>'+(wait?'🔔 ':'')+'<b>№'+esc(o.id)+'</b> '+hl(o.name,q)+'</div>'+pillZ(acc?'Принято':st)+'</div>';
+    if(meta) h+='<div class="meta">'+hl(meta,q)+'</div>';
+    if(o.price) h+='<div class="meta price">'+nf(o.price)+' ₽'+(o.unit?' / '+esc(o.unit):'')+(s?'<span class="tot">= '+nf(s)+' ₽</span>':'')+'</div>';
+    if(o.comment) h+='<div class="meta">💬 '+esc(o.comment)+'</div>';
+    if(o.photo) h+='<img src="'+esc(o.photo)+'" loading="lazy" style="max-width:120px;max-height:120px;border-radius:8px;margin-top:8px;display:block" onerror="this.style.display=\'none\'">';
+    if(o.link) h+='<div class="meta"><a href="'+esc(o.link)+'" target="_blank" style="color:#5b9bd5;font-weight:600">🔗 ссылка</a></div>';
+    h+='<div class="acts">';
+    if(canOrder) h+='<button class="b-again" onclick="orderAgain('+o.id+')">🛒 Заказать ещё</button>';
+    if(st==='Надо купить') h+='<button class="b-cancel" onclick="cancelZk('+o.id+')">Отменить</button>';
+    h+='</div>';
+    if(st==='Склад Участок' && !acc) h+='<button onclick="recvZk('+o.id+')" style="margin-top:9px;width:100%;min-height:46px;border:none;border-radius:10px;background:#234b30;color:#fff;font-weight:700">✓ Принять на участок</button>';
+    if(st==='Склад Участок') h+='<button onclick="photoZk('+o.id+')" style="margin-top:9px;width:100%;min-height:44px;border:1px solid var(--line);border-radius:10px;background:#1a2733;color:#8fc9e8;font-weight:600">📷 '+(o.photo2?'Переснять фото':'Добавить фото товара')+'</button>';
+    return h+'</div>';
+  }).join('');
+}
+function cancelZk(id){ if(!confirm('Отменить заявку №'+id+'?')) return; post(zakWA,{action:'cancel_item',id:id,who:ME.name},function(){ toast('Заявка отменена'); setTimeout(loadOrders,1200); }); }
+function photoZk(id){
+  var inp=$('filePick'); inp.removeAttribute('capture');
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; inp.value=''; if(!f){ return; }
+    toast('Загружаю фото…');
+    var rd=new FileReader(); rd.onload=function(e){ shrink(e.target.result,1200,function(b64){
+      post(zakWA,{action:'set_photo',id:id,photoBase64:b64},function(){ toast('✓ Фото добавлено'); setTimeout(loadOrders,1500); });
+    }); }; rd.readAsDataURL(f);
+  };
+  inp.click();
+}
+function recvZk(id){
+  var inp=$('filePick'); inp.removeAttribute('capture');
+  inp.onchange=function(){ var f=inp.files&&inp.files[0]; inp.value='';
+    if(!f){ post(zakWA,{action:'receive_item',id:id,who:ME.name},function(){toast('✓ Принято');setTimeout(loadOrders,1300);}); return; }
+    toast('Загружаю фото…');
+    var rd=new FileReader(); rd.onload=function(e){ shrink(e.target.result,1200,function(b64){
+      post(zakWA,{action:'receive_item',id:id,photoBase64:b64,who:ME.name},function(){toast('✓ Принято, фото загружено');setTimeout(loadOrders,1500);});
+    });}; rd.readAsDataURL(f);
+  };
+  if(confirm('Приложить фото приёмки? OK — сделать фото, Отмена — принять без фото')) inp.click();
+  else post(zakWA,{action:'receive_item',id:id,who:ME.name},function(){toast('✓ Принято');setTimeout(loadOrders,1300);});
+}
+
+// ============================================================
+//  ЗАКУПКИ — сторона закупщика: заявки · заказано · поиск · правка
+// ============================================================
+var zqTech='', zqNode='', zoTech='', zoNode='', zsTech='', zsNode='';
+function chips(list, field, cur, chipVar, wrapId, after, allLabel){
+  var box=$(wrapId); if(!box) return;
+  var t={}; list.forEach(function(o){ var k=(o[field]||'').trim(); if(k) t[k]=(t[k]||0)+1; });
+  var keys=Object.keys(t).sort();
+  if(!keys.length){ box.innerHTML=''; return; }
+  var html='<div class="chip'+(cur===''?' on':'')+'" onclick="'+chipVar+'=\'\';'+after+'">'+(allLabel||'Все')+' ('+list.length+')</div>';
+  keys.forEach(function(k){ html+='<div class="chip'+(cur===k?' on':'')+'" onclick="'+chipVar+'=\''+q1(k)+'\';'+after+'">'+esc(k)+' ('+t[k]+')</div>'; });
+  box.innerHTML=html;
+}
+function baseCard(o,q){
+  var meta=[o.qty?(o.qty+' '+(o.unit||'')):'',o.tech,o.node,o.date].filter(Boolean).join(' · '), s=sumOf(o);
+  var h='<div class="card"><div class="top"><span class="nm">№'+esc(o.id)+' '+hl(o.name,q)+'</span></div>';
+  if(meta) h+='<div class="meta">'+hl(meta,q)+'</div>';
+  if(o.comment) h+='<div class="meta">💬 '+hl(o.comment,q)+'</div>';
+  if(o.price) h+='<div class="meta price">'+nf(o.price)+' ₽'+(o.unit?(' / '+esc(o.unit)):'')+(s?('<span class="tot">= '+nf(s)+' ₽</span>'):'')+'</div>';
+  if(o.photo) h+='<img src="'+esc(o.photo)+'" loading="lazy" style="max-width:110px;max-height:110px;border-radius:8px;margin-top:8px;display:block" onerror="this.style.display=\'none\'">';
+  if(o.link) h+='<div class="meta"><a href="'+esc(o.link)+'" target="_blank" style="color:#6aa5e8;font-weight:600">🔗 ссылка</a></div>';
+  return h;
+}
+function drawZq(){
+  var q=gv('zq-q').trim();
+  var all=ORD.filter(function(o){ return o.status==='Надо купить'; });
+  chips(all,'tech',zqTech,'zqTech','zq-chips','drawZq()','Вся техника');
+  var byTech=all.filter(function(o){ return !zqTech||(o.tech||'')===zqTech; });
+  chips(byTech,'node',zqNode,'zqNode','zq-nchips','drawZq()','Все узлы');
+  var list=byTech.filter(function(o){ return (!zqNode||(o.node||'')===zqNode) && matches(o,q); });
+  list.sort(function(a,b){return (Number(b.id)||0)-(Number(a.id)||0);});
+  var tot=0; all.forEach(function(o){ tot+=sumOf(o); });
+  var tb=$('zq-tot'); if(all.length){ tb.style.display='block'; tb.innerHTML='итого к покупке: <b>'+all.length+' '+(all.length===1?'позиция':all.length<5?'позиции':'позиций')+(tot?' · '+nf(Math.round(tot))+' ₽':'')+'</b>'; } else tb.style.display='none';
+  var box=$('zq-list');
+  if(!list.length){ box.innerHTML='<div class="empty">'+(q||zqTech||zqNode?'Ничего не нашлось':'Нет новых заявок 👌')+'</div>'; return; }
+  box.innerHTML=list.map(function(o){
+    return baseCard(o,q)+'<div class="acts">'
+      +'<button class="b-ord" onclick="setSt('+o.id+',\'Заказал\')">✓ Заказал</button>'
+      +'<button class="b-cancel" onclick="setSt('+o.id+',\'Отменён\')">Отменить</button>'
+      +'<button class="b-edit" onclick="openEditItem('+o.id+')">✏ Изменить</button>'
+      +'</div></div>';
+  }).join('');
+}
+function drawZo(){
+  var q=gv('zo-q').trim();
+  var all=ORD.filter(function(o){ return o.status==='Заказал'; });
+  chips(all,'tech',zoTech,'zoTech','zo-chips','drawZo()','Вся техника');
+  var byTech=all.filter(function(o){ return !zoTech||(o.tech||'')===zoTech; });
+  chips(byTech,'node',zoNode,'zoNode','zo-nchips','drawZo()','Все узлы');
+  var list=byTech.filter(function(o){ return (!zoNode||(o.node||'')===zoNode) && matches(o,q); });
+  list.sort(function(a,b){return (Number(b.id)||0)-(Number(a.id)||0);});
+  var box=$('zo-list'), canOrder=hasSub('zk','order');
+  if(!list.length){ box.innerHTML='<div class="empty">'+(q||zoTech||zoNode?'Ничего не нашлось':'Ничего не заказано')+'</div>'; return; }
+  box.innerHTML=list.map(function(o){
+    return baseCard(o,q)+'<div class="acts">'
+      +'<button class="b-uch" onclick="setSt('+o.id+',\'Склад Участок\')">→ Участок</button>'
+      +'<button class="b-bry" onclick="setSt('+o.id+',\'Склад Брянская\')">→ Брянская</button>'
+      +'<button class="b-gar" onclick="setSt('+o.id+',\'Склад Гараж\')">→ Гараж</button>'
+      +'<button class="b-edit" onclick="openEditItem('+o.id+')">✏ Изменить</button>'
+      +(canOrder?'<button class="b-again" onclick="orderAgain('+o.id+')">🛒 Ещё</button>':'')
+      +'</div></div>';
+  }).join('');
+}
+function setSt(id,to){
+  if(to==='Отменён' && !confirm('Отменить заявку №'+id+'?')) return;
+  toast('Сохраняю…');
+  post(zakWA,{action: to==='Отменён'?'cancel_item':'set_status', id:id, to:to, who:ME.name}, function(){ toast('✓ '+to); ME.homeAt=0; setTimeout(loadOrders,1200); });
+}
+function drawZs(){
+  var q=gv('zs-q').trim();
+  chips(ORD,'tech',zsTech,'zsTech','zs-chips','drawZs()','Вся техника');
+  var byTech=ORD.filter(function(o){ return !zsTech||(o.tech||'')===zsTech; });
+  chips(byTech,'node',zsNode,'zsNode','zs-nchips','drawZs()','Все узлы');
+  var zl=byTech.filter(function(o){ return (!zsNode||(o.node||'')===zsNode) && matches(o,q); }).sort(function(a,b){return (Number(b.id)||0)-(Number(a.id)||0);});
+  var cl=norm(q) ? CAT.filter(function(x){ return matchesCat(x,q) && (!zsTech||x.tech===zsTech) && (!zsNode||(x.node||'')===zsNode); }) : [];
+  $('zs-count').textContent='Заявок: '+zl.length+(cl.length?('   ·   в каталоге: '+cl.length):'')+'   (всего партий: '+ORD.length+')';
+  var box=$('zs-list'), canOrder=hasSub('zk','order');
+  if(!zl.length && !cl.length){ box.innerHTML='<div class="empty">'+(norm(q)?'Ничего не нашлось. Попробуй одно слово или артикул.':'Начни печатать — найду по всем заявкам и каталогу')+'</div>'; return; }
+  var html='';
+  if(zl.length){
+    html+='<div class="sec">Заявки и партии</div>';
+    html+=zl.slice(0,200).map(function(o){
+      var acc=(o.accepted==='✓'); var h=baseCard(o,q);
+      h+='<div style="margin-top:8px">'+pillZ(acc?'Принято':o.status)+'</div><div class="acts">';
+      if(o.status==='Надо купить'){ h+='<button class="b-ord" onclick="setSt('+o.id+',\'Заказал\')">✓ Заказал</button><button class="b-cancel" onclick="setSt('+o.id+',\'Отменён\')">Отменить</button>'; }
+      else if(o.status==='Заказал'){ h+='<button class="b-uch" onclick="setSt('+o.id+',\'Склад Участок\')">→ Участок</button><button class="b-bry" onclick="setSt('+o.id+',\'Склад Брянская\')">→ Брянская</button><button class="b-gar" onclick="setSt('+o.id+',\'Склад Гараж\')">→ Гараж</button>'; }
+      h+='<button class="b-edit" onclick="openEditItem('+o.id+')">✏ Изменить</button>';
+      if(canOrder) h+='<button class="b-again" onclick="orderAgain('+o.id+')">🛒 Ещё</button>';
+      return h+'</div></div>';
+    }).join('');
+    if(zl.length>200) html+='<div class="meta" style="margin-top:8px">Показаны первые 200 — уточни запрос</div>';
+  }
+  if(cl.length){
+    html+='<div class="sec">Каталог</div>';
+    html+=cl.slice(0,60).map(function(x){
+      var h='<div class="card"><div class="top"><span class="nm">'+hl(x.name,q)+'</span>'+(x.tech?'<span class="pill gr">'+esc(x.tech)+'</span>':'')+'</div>';
+      if(x.node) h+='<div class="meta">🔧 '+hl(x.node,q)+'</div>';
+      if(x.price) h+='<div class="meta price">'+nf(x.price)+' ₽'+(x.unit?(' / '+esc(x.unit)):'')+'</div>';
+      if(x.photo) h+='<img src="'+esc(x.photo)+'" loading="lazy" style="max-width:110px;max-height:110px;border-radius:8px;margin-top:8px;display:block" onerror="this.style.display=\'none\'">';
+      h+='<div class="acts">';
+      if(canOrder) h+='<button style="background:var(--acc)" onclick="orderFromCat(\''+q1(x.name)+'\')">🛒 Заказать</button>';
+      if(x.link) h+='<button class="b-edit" onclick="window.open(\''+esc(x.link)+'\',\'_blank\')">🔗 Открыть</button>';
+      h+='<button class="b-edit" onclick="openEdit(\''+q1(x.name)+'\')">✏ Изменить</button>';
+      return h+'</div></div>';
+    }).join('');
+  }
+  box.innerHTML=html;
+}
+// правка (заявка / каталог)
+var editMode='cat', editId=0, editName='';
+function mPrev(url){ var pv=$('m-prev'); var ls=$('m-lstat'); if(ls) ls.textContent=''; if(!pv) return; if(url){ pv.src=url; pv.style.display='block'; } else pv.style.display='none'; }
+function closeModal(){ $('modal').classList.remove('show'); }
+function openEdit(name){ var x=CAT.find(function(i){return i.name===name;}); if(!x)return; editName=name; editMode='cat';
+  $('m-title').textContent='Редактировать товар'; $('m-sub').textContent=name;
+  sv('m-name',x.name); sv('m-price',x.price||''); sv('m-unit',x.unit||''); sv('m-link',x.link||'');
+  $('m-qty-f').style.display='none'; $('m-comm-f').style.display='none';
+  var sel=$('m-tech'); sel.innerHTML=TECHS.map(function(t){return '<option'+(t===x.tech?' selected':'')+'>'+t+'</option>';}).join('');
+  if(x.tech && TECHS.indexOf(x.tech)<0) sel.innerHTML+='<option selected>'+esc(x.tech)+'</option>';
+  fillNodes('m-tech','m-node',x.node||''); mPrev(x.photo||''); calcSum('m');
+  $('modal').classList.add('show');
+}
+function openEditItem(id){ var o=ORD.find(function(x){return String(x.id)===String(id);}); if(!o)return;
+  editMode='item'; editId=id;
+  $('m-title').textContent='Редактировать заявку №'+id; $('m-sub').textContent=o.name;
+  sv('m-name',o.name||''); sv('m-qty',o.qty||''); sv('m-price',o.price||''); sv('m-unit',o.unit||''); sv('m-link',o.link||''); sv('m-comm',o.comment||'');
+  $('m-qty-f').style.display='block'; $('m-comm-f').style.display='block';
+  var sel=$('m-tech'); sel.innerHTML=TECHS.map(function(t){return '<option'+(t===o.tech?' selected':'')+'>'+t+'</option>';}).join('');
+  if(o.tech && TECHS.indexOf(o.tech)<0) sel.innerHTML+='<option selected>'+esc(o.tech)+'</option>';
+  fillNodes('m-tech','m-node',o.node||''); mPrev(o.photo||''); calcSum('m');
+  $('modal').classList.add('show');
+}
+function saveEdit(){
+  toast('Сохраняю…');
+  if(editMode==='item'){
+    post(zakWA,{action:'edit_item', id:editId, name:gv('m-name'), qty:gv('m-qty'), price:gv('m-price'), unit:gv('m-unit'), tech:gv('m-tech'), node:gv('m-node'), link:gv('m-link'), comment:gv('m-comm'), who:ME.name},
+      function(){ closeModal(); toast('✓ Заявка изменена'); setTimeout(loadOrders,1300); });
+    return;
+  }
+  post(zakWA,{action:'catalog_edit', name:editName, newName:gv('m-name'), price:gv('m-price'), unit:gv('m-unit'), tech:gv('m-tech'), node:gv('m-node'), link:gv('m-link')},
+    function(){ closeModal(); toast('✓ Сохранено'); setTimeout(loadCat,1300); });
+}
+</script>
+<script>
+// ============================================================
+//  ТЕХНИКА: список машин → карточка (заправка / до ТО) → ремонт
+// ============================================================
+var TEV='list', TE_CUR=null, REP=[], rmActiveRow=0, TO_DATA={};
+function teView(v){ TEV=v;
+  $('te-list').style.display=v==='list'?'block':'none';
+  $('te-card').style.display=v==='card'?'block':'none';
+  $('rm-new').style.display=v==='rm'?'block':'none';
+  if(v==='list') drawMach();
+  if(!REP.length) loadRepairs();
+  updBar(); window.scrollTo(0,0);
+}
+function sameTech(t,m){ var lt=norm(t); if(!lt) return false;
+  if(lt===norm(m.rm)||lt===norm(m.full)||lt===norm(m.zk)||lt===norm(m.name)) return true;
+  for(var i=0;i<m.al.length;i++) if(lt.indexOf(norm(m.al[i]))>=0 && norm(m.al[i])) return true;
+  return false; }
+function repsOf(m){ return REP.filter(function(x){ return sameTech(x.tech,m); }); }
+function repActive(x){ return (x.status||'').toLowerCase().indexOf('выполн')<0; }
+function drawMach(){
+  var ms=myMachines(), box=$('te-cards');
+  if(!ms.length){ box.innerHTML='<div class="empty">Техника тебе пока не открыта.<br>Руководитель впишет машины в «Доступе».</div>'; $('te-reps').innerHTML=''; return; }
+  box.innerHTML=ms.map(function(m){
+    var act=repsOf(m).filter(repActive).length;
+    var r= act ? '<div class="r bad">🔧 '+act+'</div>' : '<div class="r ok">'+(m.kind==='car'?'⛽ заправить':'→')+'</div>';
+    var sub= act ? (act===1?'ремонт в работе':'ремонтов в работе: '+act) : (m.kind==='car'?'заправка · ремонт · запчасти':m.kind==='heavy'?'смена · ремонт · запчасти':'ремонт · запчасти');
+    return '<div class="uc" onclick="openMach(\''+q1(m.key)+'\')"><div class="th">'+m.icon+'</div><div class="t"><b>'+esc(m.name)+'</b><span>'+sub+'</span></div>'+r+'</div>';
+  }).join('');
+  var mine=REP.filter(function(x){ return repActive(x) && ms.some(function(m){ return sameTech(x.tech,m); }); });
+  setBadge('bd-te',mine.length);
+  $('te-reps').innerHTML= mine.length ? mine.map(repCard).join('') : '<div class="hint">Ремонтов в работе нет.</div>';
+}
+function openMach(key){ var m=machByKey(key); if(!m) return; TE_CUR=m; TEV='card'; GT('te'); drawMachCard(); }
+function drawMachCard(){ var m=TE_CUR; if(!m) return;
+  $('te-head').innerHTML='<div class="who">'+m.icon+' '+esc(m.full)+'</div><div class="mt" style="color:var(--muted);font-size:12px;margin-top:3px">'
+    +(m.kind==='car'?'легковая · топливо '+m.fuel:m.kind==='heavy'?'спецтехника · топливо '+m.fuel:'оборудование')+'</div>';
+  var h='';
+  if(m.kind==='car'){
+    h+='<div class="sec">⛽ Заправка</div>'
+      +'<div class="field"><label>Дата</label><input id="lg-d" type="date"></div>'
+      +'<div class="rowf"><div class="field"><label>Одометр, км</label><input id="lg-odo" type="number" inputmode="numeric" placeholder="274500"></div><div class="field"><label>Залито, л</label><input id="lg-lit" type="number" step="0.1" inputmode="decimal" placeholder="40"></div></div>'
+      +'<div class="field"><label>Топливо <span class="tag t-auto">по машине</span></label><input id="lg-fuel" value="'+(m.fuel==='АИ-92'?'бензин':'дизель')+'" readonly></div>'
+      +'<div class="field"><label>Заправка (АЗС)</label><select id="lg-azs" onchange="azsPick(\'lg\')"></select><input id="lg-azs-new" placeholder="название новой АЗС" style="display:none;margin-top:8px"></div>'
+      +'<div class="field"><label>Цена, ₽/л <span class="tag t-opt">не обязательно</span></label><input id="lg-price" type="number" step="0.01" inputmode="decimal" placeholder="0,00"></div>'
+      +'<div class="field"><label>Примечание</label><input id="lg-note" placeholder="необязательно"></div>'
+      +'<div class="hint">«Проехал» и л/100 посчитаются в таблице сами.</div>'
+      +'<div class="sec">⏰ До ТО</div><div id="te-to"><div class="hint">загрузка…</div></div>';
+  } else if(m.kind==='heavy'){
+    h+='<div class="sec">⏰ До ТО</div><div id="te-to"><div class="hint">загрузка…</div></div>';
+  } else {
+    h+='<div class="hint" style="margin-top:10px">По этой единице — только ремонты и запчасти.</div>';
+  }
+  h+='<div class="sec">🔍 Осмотр</div><div class="ztog" style="margin-top:8px"><button id="te-osm-ok" onclick="teOsm(\'ok\')">✅ Всё ок</button><button id="te-osm-bad" onclick="teOsm(\'bad\')">⚠ Замечания</button></div>'
+    +'<input id="te-osm-n" placeholder="что не так: масло, течь, шум…" style="display:none;margin-top:8px">'
+    +'<button class="ghost" onclick="sendInspect()">Записать осмотр</button>';
+  $('te-body').innerHTML=h; TE_OSM='';
+  if(m.kind==='car'){ sv('lg-d',todayISO()); fillAzs('lg-azs',''); }
+  if(m.kind==='heavy'||m.kind==='car') loadTo(m);
+  var btns='';
+  if(hasSub('zk','order')) btns+='<button class="ghost" style="margin-top:0;flex:1" onclick="partFor(\''+q1(m.key)+'\')">🛒 Заказать запчасть</button>';
+  btns+='<button class="ghost" style="margin-top:0;flex:1;background:#3b2a22;border-color:#5d4037" onclick="rmFor(\''+q1(m.key)+'\')">🔧 Добавить ремонт</button>';
+  $('te-btns').innerHTML=btns;
+  drawReps1();
+}
+function drawReps1(){ var m=TE_CUR; if(!m) return; var list=repsOf(m);
+  $('te-reps1').innerHTML= list.length ? list.map(repCard).join('') : '<div class="hint">Ремонтов по этой машине не было.</div>'; }
+// до ТО — из «Журнала основы» (тяжёлые) и таблицы легковых (машины): action=to&tech=
+function loadTo(m){ jsonp(brigWA,'to','tech='+enc(m.zk),function(r){
+  if(TE_CUR!==m) return; var box=$('te-to'); if(!box) return;
+  if(!r){ box.innerHTML='<div class="off">«Журнал основы» не ответил — остаток до ТО пока не показать. Смену по этой машине записывай во вкладке «Смена».</div>'; return; }
+  if(!r.ok||!r.items){ box.innerHTML='<div class="hint">'+esc(r.error||'регламент ТО не ведётся')+'</div>'; return; }
+  TO_DATA[m.key]=r; var unit=r.unit||'м/ч';
+  var urg=r.items.filter(function(x){return x.left<0;}).length, soon=r.items.filter(function(x){return x.left>=0&&x.left<=(x.soon||0);}).length;
+  var h='<div class="kpi k3"><div class="k"><span>'+(unit==='км'?'Пробег':'Моточасы')+'</span><b>'+nf(r.hours)+'</b><i>'+unit+'</i></div><div class="k"><span>Срочно</span><b class="'+(urg?'bad':'')+'">'+urg+'</b></div><div class="k"><span>Скоро</span><b class="'+(soon?'warn':'')+'">'+soon+'</b></div></div>';
+  if(!r.items.length) h+='<div class="hint">Регламент по этой машине не задан.</div>';
+  h+=r.items.map(function(x){ var bad=x.left<0, sn=!bad&&x.left<=(x.soon||0); var pct=x.every?Math.max(0,Math.min(100,Math.round((x.every-x.left)/x.every*100))):0;
+    return '<div class="to"><div class="r1"><div><div class="nm">'+esc(x.node)+'</div><div class="mt">'+(x.vid?esc(x.vid)+' · ':'')+'каждые '+nf(x.every)+' '+unit+' · последнее '+nf(x.last)+'</div></div>'
+      +'<span class="pill '+(bad?'no':sn?'no':'ok')+'">'+(bad?'🔴 '+nf(x.left):sn?'🟡 через '+nf(x.left):'🟢 через '+nf(x.left))+'</span></div>'
+      +'<div class="pr"><i class="'+(bad?'b':sn?'w':'')+'" style="width:'+pct+'%"></i></div>'
+      +'<div style="display:flex;justify-content:flex-end;margin-top:6px"><button onclick="toDone('+x.row+',\''+q1(x.node)+'\')" style="min-height:34px;border:1px solid var(--line);border-radius:8px;background:var(--card);color:#9be3ac;font-size:12.5px;font-weight:700;padding:0 10px">✅ Сделал ТО</button></div></div>'; }).join('');
+  if(!r.hours) h+='<div class="hint" style="margin-top:8px">Счётчик '+(unit==='км'?'пробега':'моточасов')+' не заполнен — остаток считается от нуля.</div>';
+  box.innerHTML=h;
+}); }
+function toDone(row,node){ var m=TE_CUR; if(!m) return; var r=TO_DATA[m.key]||{};
+  if(!confirm('Отметить «'+node+'» как выполненное сейчас, при '+nf(r.hours||0)+' '+(r.unit||'м/ч')+'?')) return;
+  toast('Записываю ТО…');
+  post(brigWA,{action:'to_done',tech:m.zk,row:row,who:ME.name},function(){ toast('✓ ТО записано'); setTimeout(function(){ if(TE_CUR===m) loadTo(m); },1500); });
+}
+// осмотр из карточки машины (в т.ч. легковые) → лист «🔍 Осмотры» в «Журнале основы»
+var TE_OSM='';
+function teOsm(v){ TE_OSM=(TE_OSM===v)?'':v; var ok=$('te-osm-ok'), bad=$('te-osm-bad'), n=$('te-osm-n');
+  if(ok) ok.classList.toggle('on',TE_OSM==='ok'); if(bad) bad.classList.toggle('on',TE_OSM==='bad');
+  if(n){ n.style.display=TE_OSM==='bad'?'block':'none'; if(TE_OSM==='bad') n.focus(); } }
+function sendInspect(){ var m=TE_CUR; if(!m) return;
+  if(!TE_OSM){ toast('Выбери: всё ок или замечания',true); return; }
+  var note=gv('te-osm-n').trim(); if(TE_OSM==='bad'&&!note){ toast('Напиши, что не так',true); return; }
+  toast('Записываю осмотр…');
+  post(brigWA,{action:'inspect',tech:m.zk,ok:TE_OSM==='ok',note:note,who:ME.name},function(){ toast('✓ Осмотр записан: '+m.name); teOsm(TE_OSM); sv('te-osm-n',''); });
+}
+function partFor(key){ var m=machByKey(key); if(!m) return;
+  SUB.zk='order'; GT('zk'); setTechSel('zk-tech',m.zk); fillNodes('zk-tech','zk-node'); lstat('Техника подставлена: '+m.zk,'ok'); }
+function rmFor(key){ var m=machByKey(key); if(!m) return; TE_CUR=m; TEV='rm'; GT('te'); setTechSel('rm-tech',m.rm); }
+function saveLg(btn){ var m=TE_CUR; if(!m){ btn.disabled=false; return; }
+  var lit=gv('lg-lit'); if(!lit){toast('Сколько залито?',true);btn.disabled=false;return;}
+  var azs=azsVal('lg'), fuel=gv('lg-fuel')||'дизель';
+  post(brigWA,{action:'zapravka',car:m.car||m.name,fuel:fuel,odo:gv('lg-odo'),liters:lit,date:gv('lg-d'),note:gv('lg-note'),azs:azs,price:String(gv('lg-price')).replace(',','.'),who:ME.name},function(){
+    done_(btn,'✓ Заправка записана: '+m.name); rememberAzs(azs);
+    ['lg-odo','lg-lit','lg-note','lg-price'].forEach(clr); fillAzs('lg-azs','');
+  });
+}
+
+// ---- ремонт ----
+var rmPartRows=0;
+function addRmPartRow(){
+  var box=$('rm-parts-list'); var i=rmPartRows++;
+  var div=document.createElement('div'); div.id='rmpr'+i;
+  div.style.cssText='border:1px solid var(--line);border-radius:10px;padding:8px;margin-top:8px';
+  div.innerHTML='<div style="display:flex;gap:6px;align-items:center">'
+    +'<input id="rmpn'+i+'" placeholder="деталь / расходник" style="flex:2;min-height:44px;font-size:15px;padding:0 10px">'
+    +'<input id="rmpq'+i+'" type="number" placeholder="1" style="width:64px;min-height:44px;font-size:15px;text-align:center;padding:0">'
+    +'<button onclick="document.getElementById(\'rmpr'+i+'\').remove()" style="min-height:44px;min-width:40px;border:none;border-radius:9px;background:#4a2020;color:#ff9b9b;font-weight:700">✕</button></div>'
+    +'<input id="rmpl'+i+'" type="url" placeholder="ссылка (необязательно)" style="min-height:42px;font-size:14px;margin-top:6px">'
+    +'<input id="rmpc'+i+'" placeholder="комментарий (необязательно)" style="min-height:42px;font-size:14px;margin-top:6px">';
+  box.appendChild(div);
+}
+function collectRmParts(){ var parts=[];
+  for(var i=0;i<rmPartRows;i++){ var n=$('rmpn'+i); if(!n) continue; var name=n.value.trim(); if(!name) continue;
+    var q=$('rmpq'+i), l=$('rmpl'+i), c=$('rmpc'+i);
+    parts.push({name:name, qty:(q&&q.value)?Number(q.value):1, unit:'шт', link:(l?l.value.trim():''), comment:(c?c.value.trim():'')}); }
+  return parts;
+}
+function saveRm(btn){
+  var fault=gv('rm-fault').trim(); if(!fault){toast('Что сломалось?',true);btn.disabled=false;return;}
+  var parts=collectRmParts(), tech=gv('rm-tech');
+  post(remWA,{action:'repair_create',tech:tech,mch:gv('rm-mch'),fault:fault,photoBase64:rmPhoto||'',who:ME.name},function(){
+    if(parts.length){
+      var partNames=parts.map(function(p){return p.name;}).join('; ');
+      parts.forEach(function(p){ post(zakWA,{action:'zakupka_save',name:p.name,qty:p.qty,unit:p.unit||'шт',tech:zkTechOf(tech),link:p.link||'',comment:(p.comment?('из ремонта: '+p.comment):'из ремонта'),who:ME.name},function(){}); });
+      setTimeout(function(){ post(remWA,{action:'repair_wait_part_last',part:partNames},function(){}); }, 600);
+    }
+    done_(btn, parts.length?'✓ Заявка создана, детали заказаны':'✓ Заявка создана');
+    ['rm-mch','rm-fault'].forEach(clr); $('rm-parts-list').innerHTML=''; rmPartRows=0;
+    rmPhoto=''; var pb=$('rm-pb'); pb.classList.remove('done'); pb.textContent='📷 Фото поломки (необязательно)'; $('rm-prev').style.display='none';
+    setTimeout(function(){ REP=[]; teView(TE_CUR?'card':'list'); if(TE_CUR) drawMachCard(); }, 1100);
+  });
+}
+// техника в ремонте называется длинно — для закупок берём короткое имя из справочника
+function zkTechOf(t){ var lt=norm(t); for(var i=0;i<MACH.length;i++){ if(sameTech(t,MACH[i])) return MACH[i].zk; } return t; }
+function matchTech(t){ t=String(t||''); if(NODE_MAP[t]) return t;
+  var keys=Object.keys(NODE_MAP), lt=norm(t);
+  for(var i=0;i<keys.length;i++){ var lk=norm(keys[i]); if(lt.indexOf(lk)>=0||lk.indexOf(lt)>=0) return keys[i]; }
+  for(var j=0;j<keys.length;j++){ var w=norm(keys[j]).split(' ')[0]; if(w.length>2 && lt.indexOf(w)>=0) return keys[j]; }
+  return zkTechOf(t);
+}
+function loadRepairs(){
+  jsonp(remWA,'repairs','',function(r){ REP=(r&&r.items)||[]; if(curTab==='te'){ if(TEV==='list') drawMach(); else if(TEV==='card') drawReps1(); } });
+}
+function rmStColor(s){ s=(s||'').toLowerCase();
+  if(s.indexOf('диагн')>=0)return'#6aa5e8'; if(s.indexOf('ждёт')>=0||s.indexOf('ждет')>=0)return'#f0a050';
+  if(s.indexOf('работе')>=0)return'#c3a9ff'; if(s.indexOf('выполн')>=0)return'#6fd08a'; return'#889'; }
+function repCard(x){
+  var col=rmStColor(x.status), done=!repActive(x);
+  var meta=[x.tech, x.mch?('м/ч '+x.mch):'', x.date].filter(Boolean).join(' · ');
+  var idle=x.idleH!==''&&x.idleH!=null?('простой '+x.idleH+' ч'):'';
+  var wait=x.waitH?('ждали запчасть '+x.waitH+' ч'):'';
+  var h='<div class="card" style="border-color:'+(done?'var(--line)':col)+'">'
+    +'<div class="top"><div><b>№'+esc(x.num)+'</b> '+esc(x.fault)+'</div>'
+    +'<span style="font-size:12px;font-weight:700;padding:3px 10px;border-radius:20px;background:'+col+'22;color:'+col+';white-space:nowrap">'+esc(x.status)+'</span></div>'
+    +'<div class="meta">'+esc(meta)+'</div>';
+  if(idle||wait) h+='<div class="meta">'+[idle,wait].filter(Boolean).join(' · ')+'</div>';
+  if(x.parts) h+='<div class="meta" style="color:#c9a">🔩 '+esc(x.parts)+'</div>';
+  if(x.photo||x.photo2){ h+='<div style="display:flex;gap:8px;margin-top:8px">';
+    if(x.photo)  h+='<div style="text-align:center"><img src="'+esc(x.photo)+'" loading="lazy" style="max-width:100px;max-height:100px;border-radius:8px;display:block" onerror="this.parentNode.style.display=\'none\'"><div class="hint" style="margin-top:2px">до</div></div>';
+    if(x.photo2) h+='<div style="text-align:center"><img src="'+esc(x.photo2)+'" loading="lazy" style="max-width:100px;max-height:100px;border-radius:8px;display:block" onerror="this.parentNode.style.display=\'none\'"><div class="hint" style="margin-top:2px">после</div></div>';
+    h+='</div>'; }
+  if(!done){
+    var st=(x.status||'').toLowerCase();
+    h+='<div class="acts">';
+    h+='<button class="b-ord" onclick="rmPart('+x.row+',\''+q1(x.tech)+'\')">🛒 Заказать деталь</button>';
+    if(st.indexOf('работе')<0) h+='<button class="b-bry" onclick="rmSetStatus('+x.row+',\'В работе\')">🔧 В работе</button>';
+    h+='<button class="b-uch" onclick="rmFinish('+x.row+')">✓ Выполнено</button>';
+    h+='</div>';
+  }
+  return h+'</div>';
+}
+function rmSetStatus(row,status){ toast('Меняю…'); post(remWA,{action:'repair_status',row:row,status:status,who:ME.name},function(){ toast('✓ '+status); setTimeout(loadRepairs,1000); }); }
+function rmFinish(row){ rmActiveRow=row; rmfPhoto='';
+  sv('rmf-work',''); sv('rmf-parts','');
+  var pb=$('rmf-pb'); pb.classList.remove('done'); pb.textContent='📷 Фото как починил (необязательно)'; $('rmf-prev').style.display='none';
+  $('rm-finish-modal').classList.add('show');
+}
+function closeRmFinish(){ $('rm-finish-modal').classList.remove('show'); }
+function submitRmFinish(){ toast('Сохраняю…');
+  post(remWA,{action:'repair_finish',row:rmActiveRow,work:gv('rmf-work'),parts:gv('rmf-parts'),photoBase64:rmfPhoto||'',who:ME.name},function(){
+    closeRmFinish(); toast('✓ Ремонт выполнен'); setTimeout(loadRepairs,1200);
+  });
+}
+function rmPart(row,tech){ rmActiveRow=row;
+  $('rmp-sub').textContent='для: '+tech;
+  sv('rmp-name',''); sv('rmp-qty','1'); sv('rmp-unit','шт'); sv('rmp-link',''); sv('rmp-comment',''); sv('rmp-price','');
+  $('rmp-prev').style.display='none'; $('rmp-lstat').textContent='';
+  var sel=$('rmp-node'); var mt=matchTech(tech);
+  sel.innerHTML='<option value="">— не указан —</option>'+nodesFor(mt).map(function(n){return '<option>'+esc(n)+'</option>';}).join('');
+  $('rm-part-modal').dataset.tech=tech;
+  $('rm-part-modal').classList.add('show');
+}
+function pullRmp(){
+  var u=gv('rmp-link').trim(); var ls=$('rmp-lstat');
+  if(!u){ ls.textContent='Сначала вставь ссылку'; ls.style.color='#ff9b9b'; return; }
+  var btn=$('rmp-pull'); btn.disabled=true; ls.style.color='var(--muted)'; ls.textContent='Читаю страницу товара…';
+  jsonp(zakWA,'meta','url='+enc(u),function(r){
+    btn.disabled=false;
+    if(!r||!r.ok){ ls.textContent='Не получилось — впиши руками'; ls.style.color='#ff9b9b'; return; }
+    if(r.name) sv('rmp-name',r.name); if(r.price) sv('rmp-price',r.price);
+    var pv=$('rmp-prev'); if(r.photo){ pv.src=r.photo; pv.style.display='block'; }
+    ls.style.color='#8fe08a'; ls.textContent='✓ Подтянул с '+(r.source||'сайта')+'. Количество поставь сам';
+  });
+}
+function closeRmPart(){ $('rm-part-modal').classList.remove('show'); }
+function submitRmPart(){
+  var name=gv('rmp-name').trim(); if(!name){toast('Название детали?',true);return;}
+  var tech=$('rm-part-modal').dataset.tech||'', cmt=gv('rmp-comment').trim();
+  var pv=$('rmp-prev'); var photo=(pv&&pv.style.display!=='none')?pv.src:'';
+  toast('Заказываю деталь…');
+  post(zakWA,{action:'zakupka_save',name:name,qty:gv('rmp-qty'),unit:gv('rmp-unit'),tech:zkTechOf(tech),node:gv('rmp-node'),price:gv('rmp-price'),link:gv('rmp-link'),photo:photo,comment:(cmt?('из ремонта: '+cmt):'из ремонта'),who:ME.name},function(){
+    post(remWA,{action:'repair_wait_part',row:rmActiveRow,part:name},function(){ closeRmPart(); toast('✓ Деталь заказана, ремонт ждёт запчасть'); setTimeout(loadRepairs,1400); });
+  });
+}
+
+// ============================================================
+//  ИНФО — только чтение
+// ============================================================
+var INFO_ME=null, INFO_UCH=[];
+function loadInfo(){ var box=$('info-body'); box.innerHTML='<div class="empty">Загружаю…</div>';
+  var me=null, uch=null, n=0, want=2;
+  function fin(){ if(++n<want) return; INFO_ME=me; INFO_UCH=uch||[]; drawInfo(me,uch||[]); }
+  fuCheck(function(){
+    if(FU_ON){ want=3; jsonp(brigWA,'fuel_zayavki','brigadir='+enc(ME.name),function(r){ FU=(r&&r.items)||FU; fuTake(r); fin(); }); }
+    jsonp(zksWA,'brigady','',function(r){ var it=(r&&r.items)||[]; for(var i=0;i<it.length;i++) if(it[i].name===ME.name) me=it[i]; fin(); });
+    jsonp(zksWA,'uchastki','brigadir='+enc(ME.name),function(r){ uch=(r&&r.items)||[]; fin(); });
+  });
+  if((hasSub('zk','mine')||hasSub('zk','req')) && !ORD.length) loadOrders();
+}
+function drawInfo(me,uch){
+  var h='';
+  // саженцы
+  var planted=0,left=0,brak=0; uch.forEach(function(u){ planted+=(+u.plantedSht||0); left+=(+u.leftToPlant||0); brak+=(+u.brakSht||0); });
+  var pct=(planted+brak)>0?Math.round(brak/(planted+brak)*1000)/10:0;
+  h+='<div class="sec">🌱 Саженцы</div><div class="kpi">'
+    +'<div class="k"><span>На руках</span><b class="ok">'+nf(me?me.inBoxes:0)+'</b><i>шт</i></div>'
+    +'<div class="k"><span>Едет</span><b class="blue">'+nf(me?me.onRoadSht:0)+'</b><i>шт'+(me&&me.openZayavki?' · заявок ждёт '+me.openZayavki:'')+'</i></div>'
+    +'<div class="k"><span>Посадил</span><b>'+nf(me?me.plantedSht:planted)+'</b><i>брак '+String(pct).replace('.',',')+' %</i></div>'
+    +'<div class="k"><span>Осталось</span><b class="warn">'+nf(left)+'</b><i>на '+uch.length+' '+(uch.length===1?'участке':'участках')+'</i></div></div>';
+  if(me&&me.overdraw) h+='<div class="hand am">⚠ перерасход <b>'+nf(me.overdraw)+' шт</b> — посажено больше, чем получено. Проверь заявки.</div>';
+  h+=uch.map(function(u){ var plan=+u.needSht||0, pos=+u.plantedSht||0, p=plan?Math.min(100,Math.round(pos/plan*100)):0;
+    var pic=u.img?'<img src="'+esc(u.img)+'" alt="" onerror="this.outerHTML=\'<div class=&quot;noimg&quot;>🗺</div>\'">':'<div class="noimg">🗺</div>';
+    return '<div class="uc" style="cursor:default">'+pic+'<div class="t"><b>'+esc(u.name)+'</b><span>план '+nf(plan)+' · посажено '+nf(pos)+(u.brakSht?' · брак '+nf(u.brakSht):'')+'</span><div class="pr"><i style="width:'+p+'%"></i></div></div><div class="r'+(u.leftToPlant>0?'':' done')+'">'+(u.leftToPlant>0?'ещё '+nf(u.leftToPlant):'✓')+'</div></div>'; }).join('');
+  if(!uch.length) h+='<div class="hint">Участки за тобой не закреплены.</div>';
+  // топливо
+  h+='<div class="sec">⛽ Топливо</div>';
+  if(FU_ON){ var got={},road={}; FU.forEach(function(z){ if(z.status==='получено') got[z.fuel]=(got[z.fuel]||0)+(+z.lit||0); if(z.status==='везу') road[z.fuel]=(road[z.fuel]||0)+(+z.lit||0); });
+    var sdt=FSTOCK&&FSTOCK['ДТ'], sai=FSTOCK&&FSTOCK['АИ-92'];
+    function sk(x,lbl){ if(!x) return ''; if(x.noMeasure) return '<div class="k"><span>'+lbl+' на площадке</span><b class="warn">—</b><i>нужен замер</i></div>';
+      return '<div class="k"><span>'+lbl+' на площадке</span><b class="'+(x.calc<(x.low||0)?'bad':'ok')+'">'+nf(x.calc)+'</b><i>л · с замера '+String(x.since||'').slice(0,5)+'</i></div>'; }
+    h+='<div class="kpi">'+sk(sdt,'ДТ')+sk(sai,'АИ-92')+'<div class="k"><span>Принял я</span><b>'+nf((got['ДТ']||0)+(got['АИ-92']||0))+'</b><i>л · ДТ '+nf(got['ДТ']||0)+' · АИ-92 '+nf(got['АИ-92']||0)+'</i></div><div class="k"><span>Едет</span><b class="blue">'+nf((road['ДТ']||0)+(road['АИ-92']||0))+'</b><i>л</i></div></div>';
+    if(sdt&&!sdt.noMeasure) h+='<div class="hint">Остаток = замер + получено всеми − залито в технику по журналу смен − прочее топливо'+(sdt.unconfirmed?' · неподтверждённых смен: '+sdt.unconfirmed:'')+'</div>'; }
+  else h+='<div class="off">Остатки топлива появятся после подключения «Журнала основы».</div>';
+  // закупки
+  if(hasSub('zk','mine')||hasSub('zk','req')){
+    var need=ORD.filter(function(o){return o.status==='Надо купить';}).length, ord=ORD.filter(function(o){return o.status==='Заказал';}).length, site=ORD.filter(waitingReceive).length;
+    h+='<div class="sec">🛒 Закупки</div><div class="kpi k3"><div class="k"><span>Ждут покупки</span><b class="warn">'+need+'</b></div><div class="k"><span>Заказано</span><b>'+ord+'</b><i>в пути</i></div><div class="k"><span>На складе участка</span><b class="ok">'+site+'</b><i>забрать</i></div></div>';
+  }
+  $('info-body').innerHTML=h;
+}
+
+// ============================================================
+//  СВОДКИ — руководитель
+// ============================================================
+function loadSvod(){ var box=$('svod-body'); box.innerHTML='<div class="empty">Загружаю…</div>'; $('svod-when').textContent=ddmmyyyy(todayISO());
+  var br=null, zay=null, par=null, acc=null, sms=null, n=0;
+  function fin(){ if(++n<5) return; drawSvod(br||[],zay||[],par||[],acc||[],sms||[]); }
+  jsonp(brigWA,'smena_status','days=7',function(r){ sms=(r&&r.ok&&r.days)||[]; fin(); });
+  fuCheck(function(){});
+  jsonp(zksWA,'brigady','',function(r){ br=(r&&r.items)||[]; fin(); });
+  jsonp(zksWA,'zayavki','all=1',function(r){ zay=(r&&r.items)||[]; fin(); });
+  jsonp(zksWA,'partii','limit=120',function(r){ par=(r&&r.items)||[]; fin(); });
+  jsonp(zksWA,'access','',function(r){ acc=(r&&r.items)||[]; fin(); });
+  if(!ORD.length) loadOrders();
+}
+function drawSvod(br,zay,par,acc,sms){ sms=sms||[];
+  var h='';
+  var open=zay.filter(function(z){return z.status==='заявка';}), road=zay.filter(function(z){return z.status==='везу';});
+  var openSht=0; open.forEach(function(z){ openSht+=(+z.need||0); });
+  var got=0, pl=0, bk=0, box=0; br.forEach(function(b){ got+=(+b.gotSht||0); pl+=(+b.plantedSht||0); bk+=(+b.brakSht||0); box+=(+b.inBoxes||0); });
+  h+='<div class="sec">🌱 Саженцы</div><div class="kpi">'
+    +'<div class="k"><span>Получено всего</span><b>'+nf(got)+'</b><i>шт</i></div><div class="k"><span>Посажено</span><b class="ok">'+nf(pl)+'</b><i>брак '+nf(bk)+'</i></div>'
+    +'<div class="k"><span>На руках у бригад</span><b class="blue">'+nf(box)+'</b><i>шт</i></div><div class="k"><span>Заявок без ответа</span><b class="'+(open.length?'warn':'ok')+'">'+open.length+'</b><i>'+(open.length?nf(openSht)+' шт':'всё отвечено')+'</i></div></div>';
+  h+=br.map(function(b){ var bad=b.overdraw>0;
+    return '<div class="uc" style="cursor:default"><div class="th">👷</div><div class="t"><b>'+esc(b.name)+'</b><span>на руках '+nf(b.inBoxes)+(b.onRoadSht?' · едет '+nf(b.onRoadSht):'')+(b.openZayavki?' · ждёт ответа '+b.openZayavki:'')+(bad?' · перерасход '+nf(b.overdraw):'')+'</span></div><div class="r '+(bad?'bad':'ok')+'">'+(bad?'⚠':'✓')+'</div></div>'; }).join('');
+  if(road.length) h+='<div class="hand">🚚 в пути: '+road.map(function(z){ return nf(z.shtRec)+' → '+esc(z.brigadir.split(' ')[0]); }).join(' · ')+'</div>';
+  var noInv=par.filter(function(p){ return p.status!=='заявка' && !p.invoice; });
+  if(noInv.length){ var s=0; noInv.forEach(function(p){ s+=(+p.shtRec||0); });
+    h+='<div class="uc am" style="cursor:pointer" onclick="goCard(\'sz\',\'all\')"><div class="th">📄</div><div class="t"><b>'+noInv.length+' '+(noInv.length===1?'партия':noInv.length<5?'партии':'партий')+' без накладной</b><span>'+nf(s)+' шт · '+noInv.slice(0,3).map(function(p){return '№ '+p.n;}).join(', ')+'</span></div><div class="r">→</div></div>'; }
+  // закупки
+  var need=ORD.filter(function(o){return o.status==='Надо купить';}), ord=ORD.filter(function(o){return o.status==='Заказал';}), site=ORD.filter(waitingReceive);
+  var needSum=0, ordSum=0; need.forEach(function(o){ needSum+=sumOf(o); }); ord.forEach(function(o){ ordSum+=sumOf(o); });
+  h+='<div class="sec">🛒 Закупки</div><div class="kpi k3"><div class="k"><span>Надо купить</span><b class="'+(need.length?'warn':'ok')+'">'+need.length+'</b><i>'+nf(Math.round(needSum))+' ₽</i></div><div class="k"><span>Заказано</span><b>'+ord.length+'</b><i>'+nf(Math.round(ordSum))+' ₽</i></div><div class="k"><span>На участке</span><b class="blue">'+site.length+'</b><i>не приняты</i></div></div>';
+  // топливо / техника
+  h+='<div class="sec">⛽ Топливо на площадке</div>';
+  if(FU_ON&&FSTOCK){ var sdt=FSTOCK['ДТ']||{}, sai=FSTOCK['АИ-92']||{};
+    function sk2(x,lbl){ if(x.noMeasure) return '<div class="k"><span>'+lbl+'</span><b class="warn">—</b><i>нужен замер</i></div>';
+      return '<div class="k"><span>'+lbl+'</span><b class="'+(x.calc<(x.low||0)?'bad':'ok')+'">'+nf(x.calc)+'</b><i>л · замер '+String(x.since||'').slice(0,5)+' '+(x.by?x.by.split(' ')[0]:'')+(x.diff!=null?' · разница '+(x.diff>0?'+':'')+nf(x.diff)+' л':'')+'</i></div>'; }
+    h+='<div class="kpi">'+sk2(sdt,'ДТ')+sk2(sai,'АИ-92')+'<div class="k"><span>Получено с замера</span><b class="blue">'+nf(sdt.inn||0)+'</b><i>л ДТ · '+nf(sai.inn||0)+' л АИ-92</i></div><div class="k"><span>Залито с замера</span><b>'+nf(sdt.out||0)+'</b><i>л ДТ · '+nf(sai.out||0)+' л АИ-92'+(sdt.unconfirmed?' · не подтв. '+sdt.unconfirmed:'')+'</i></div></div>';
+    h+='<div class="hint">Подробно по заправкам — «Топливо → Все заправки». Замер — там же, кнопка «📏 Замер».</div>'; }
+  else h+= FU_ON ? '<div class="hint">Остаток не пришёл — обнови.</div>' : '<div class="off">Появится после подключения «Журнала основы».</div>';
+  // смены за неделю: кто записал, кто подтвердил
+  h+='<div class="sec">📅 Смены за 7 дней</div>';
+  if(!sms.length) h+='<div class="hint">Записей за неделю нет (или журнал не ответил).</div>';
+  h+=sms.map(function(d){ var bits=[];
+    ['bul','eks','bag'].forEach(function(k){ var b=d.blocks[k]; if(!b||!b.has) return; bits.push(SM_ICON[k]+' '+(b.who?b.who.split(' ')[0]:'?')+(b.confirmed?' ✅':b.changedAfter?' ⚠':' ⏳')); });
+    var f=d.blocks.fuel; if(f&&f.has) bits.push('⛽ '+f.summary);
+    var st=d.allConfirmed?'<span class="r ok">✓</span>':(d.changed.length?'<span class="r bad">⚠</span>':'<span class="r">⏳</span>');
+    var sub=d.conf?('подтвердил '+d.conf.by.split(' ')[0]+' '+String(d.conf.at||'').slice(-5)+(d.changed.length?' · после правили: '+d.changed.map(function(k){return SM_NAME[k].toLowerCase();}).join(', '):'')):'не подтверждена';
+    return '<div class="uc" onclick="goSm(\''+q1(d.iso)+'\')"><div class="th">📅</div><div class="t"><b>'+esc(d.date.slice(0,5))+' · '+esc(bits.join(' · ')||'пусто')+'</b><span>'+esc(sub)+'</span></div>'+st+'</div>'; }).join('');
+  // доступ
+  h+='<div class="sec">👥 Кто что видит</div>';
+  if(!acc.length) h+='<div class="hint">Лист «Доступ» ещё не создан — Зарядки → «👥 Создать / пересобрать «Доступ»».</div>';
+  h+=acc.map(function(p){ var t=p.tabs||{}, bits=[];
+    if(t.sm){ var sb=t.smb||{}, bl=[]; if(sb.kopter) bl.push('коптер'); if(sb.fuel) bl.push('прочее топливо'); if(sb.rash) bl.push('расходники'); if(sb.note) bl.push('примечание');
+      bits.push('смена'+(bl.length?' ('+bl.join(', ')+')':' (только машины)')); }
+    if(t.smc) bits.push('✔ подтверждает смену');
+    if(t.zr) bits.push('зарядка');
+    ['sz','fu','zk'].forEach(function(g){ if(!t[g]) return; var ks=SUBDEF[g].filter(function(s){return t[g][s[0]];}).map(function(s){return s[1].replace(/^\S+\s/,'').toLowerCase();}); if(ks.length) bits.push({sz:'саженцы',fu:'топливо',zk:'закупки'}[g]+': '+ks.join(', ')); });
+    if(t.info) bits.push('инфо'); if(t.svod) bits.push('сводки');
+    var ms=(p.machines||[]).map(function(s){ var m=machOf(s); return m?m.icon+' '+m.name:s; }).join(' · ');
+    return '<div class="uc" style="cursor:default"><div class="th">'+(p.active===false?'⛔':'👤')+'</div><div class="t"><b>'+esc(p.name)+(p.pinSet?' 🔒':'')+'</b><span>'+esc(bits.join(' · ')||'ничего не открыто')+'</span>'+(ms?'<span>'+ms+'</span>':'')+'</div></div>'; }).join('');
+  h+='<div class="hint" style="margin-top:8px">Правится галочками в листе «Доступ» таблицы ЗКС. Изменения подхватываются при следующем входе.</div>';
+  $('svod-body').innerHTML=h;
+}
+
+// ============================================================
+//  СТАРТ
+// ============================================================
+window.onload=function(){
+  fillWAInputs();
+  var s=todayISO(); ['sm-d','zr-d'].forEach(function(id){ sv(id,s); });
+  buildZRows(); fillNodes('zk-tech','zk-node');
+  if(needLogin()){ showLogin(); buildTabs(); }
+  else { $('me-name').textContent='👤 '+ME.name; MY_UCH=ME.uchastki||[]; buildTabs(); GT('home'); drawUch(); }
+  [loadCat,loadNodes].forEach(function(f){ try{ f(); }catch(e){} });
+  if(ME.name){ try{ loadOrders(); }catch(e){} }
+};
+</script>
+
+<div id="diag" class="diag"><div class="wrap">
+  <div class="ord-head"><b style="font-size:17px">⏱ Диагностика</b><button class="refresh" onclick="diagClose()">✕ Закрыть</button></div>
+  <div id="diag-body"></div>
+  <div style="display:flex;gap:8px;margin-top:14px">
+    <button class="ghost" style="margin-top:0" onclick="diagCopy()">Скопировать и отправить</button>
+    <button class="ghost" style="margin-top:0" onclick="diagClear()">Очистить</button>
+  </div>
+  <div class="hint" style="margin-top:12px">Красным — дольше 8 секунд, жёлтым — дольше 3. Нажми «Скопировать» и вставь текст в чат — по нему видно, какой сервер тормозит.</div>
+</div></div>
+<style>
+.diag{position:fixed;inset:0;background:var(--bg);z-index:60;display:none;overflow:auto;padding-bottom:40px}
+.diag.on{display:block}
+.diag-t{width:100%;border-collapse:collapse;font-size:12.5px}
+.diag-t th{text-align:left;color:var(--muted);font-weight:600;padding:4px 4px;border-bottom:1px solid var(--line);white-space:nowrap}
+.diag-t td{padding:5px 4px;border-bottom:1px solid var(--line);vertical-align:top}
+.diag-t tr.warn td{color:#e3b659}
+.diag-t tr.bad td{color:#f0a19b}
+.upd{position:fixed;left:12px;right:12px;bottom:96px;z-index:70;background:#B5852A;color:#111;border-radius:12px;padding:12px 14px;font-weight:700;display:none;box-shadow:0 4px 18px rgba(0,0,0,.4)}
+.upd.on{display:block}
+</style>
+<div id="upd" class="upd" onclick="location.reload()">Есть новая версия приложения — нажми, чтобы обновить</div>
+<script>
+// Офлайн-кэш и мгновенное открытие: service worker (работает только с https-хостинга, не из Apps Script)
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').then(function(reg){
+    reg.addEventListener('updatefound',function(){ var nw=reg.installing; if(!nw) return;
+      nw.addEventListener('statechange',function(){ if(nw.state==='installed'&&navigator.serviceWorker.controller){ var u=document.getElementById('upd'); if(u) u.classList.add('on'); } }); });
+  }).catch(function(){});
+  navigator.serviceWorker.addEventListener('message',function(ev){ if(ev.data&&ev.data.type==='shell-updated'){ var u=document.getElementById('upd'); if(u) u.classList.add('on'); } });
+}
+</script>
+</body>
+</html>
